@@ -1,0 +1,27 @@
+.modalContent {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  border-radius: 1rem;
+  position: fixed;
+  background-color: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: auto;
+}
+
+.parentDiv {
+  margin: 1rem;
+}
+
+.grid {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  row-gap: 1rem;
+}
+
+.dateTime {
+  width: 100%;
+}

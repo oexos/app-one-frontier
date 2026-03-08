@@ -1,0 +1,35 @@
+.grid {
+  width: 100%;
+  padding-bottom: 1rem;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+}
+
+.firstSubGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 50fr 50fr;
+}
+
+.pageName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-left: 0.5rem;
+  justify-self: left;
+}
+
+.logout.logout {
+  margin-right: 0.5rem;
+  justify-self: right;
+}
+
+.newSession {
+  margin-top: 2rem;
+  justify-self: center;
+}
+
+.sessionTab {
+  width: 100%;
+  overflow: auto;
+}
