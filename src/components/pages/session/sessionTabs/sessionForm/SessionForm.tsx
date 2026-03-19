@@ -7,7 +7,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { useEffect } from "react";
+import { debounce, type DebouncedFunc } from "lodash";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -16,6 +17,7 @@ import {
   useForm,
   type SubmitErrorHandler,
   type SubmitHandler,
+  type ValidateResult,
 } from "react-hook-form";
 import type { RootState } from "../../../../../redux-toolkit/store";
 import {
@@ -53,6 +55,7 @@ type Inputs = {
 
 const SessionForm: React.FC = () => {
   const dispatch = useDispatch();
+  const debounceRef = useRef<DebouncedFunc<() => void>>(undefined);
   const isShowSessionForm = useSelector(
     (state: RootState) => state.session.isShowSessionForm
   );
@@ -156,14 +159,33 @@ const SessionForm: React.FC = () => {
                     required: "This is required",
                   }}
                   render={({ field }) => (
-                    <TextField
-                      label="Title"
-                      variant="outlined"
-                      fullWidth
-                      helperText={formState.errors.title?.types?.required}
-                      error={Boolean(formState.errors.title?.types?.required)}
-                      {...field}
-                    />
+                    <>
+                      <TextField
+                        label="Title"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
+                        error={
+                          (formState.dirtyFields.title ||
+                            formState.touchedFields.title) &&
+                          !formState.isSubmitting &&
+                          Boolean(formState.errors.title?.types?.required)
+                        }
+                        {...field}
+                      />
+                      {(formState.dirtyFields.title ||
+                        formState.touchedFields.title) &&
+                        !formState.isSubmitting && (
+                          <>
+                            {formState.errors.title?.types?.required && (
+                              <div style={{ color: "red", fontSize: "0.8rem" }}>
+                                {formState.errors.title.types.required}
+                              </div>
+                            )}
+                          </>
+                        )}
+                    </>
                   )}
                 />
                 <Controller
@@ -171,16 +193,74 @@ const SessionForm: React.FC = () => {
                   control={control}
                   rules={{
                     required: "This is required",
+                    validate: {
+                      debounceValidation: (
+                        value
+                      ): Promise<ValidateResult> => {
+                        debounceRef.current?.cancel();
+                        return new Promise((resolve) => {
+                          debounceRef.current = debounce(() => {
+                            if (value.includes("error")) {
+                              resolve("'error' not allowed.");
+                            } else {
+                              resolve(true);
+                            }
+                          }, 1500);
+                          debounceRef.current();
+                        });
+                      },
+                    },
                   }}
                   render={({ field }) => (
-                    <TextField
-                      label="Speaker"
-                      variant="outlined"
-                      fullWidth
-                      {...field}
-                      helperText={formState.errors.speaker?.types?.required}
-                      error={Boolean(formState.errors.speaker?.types?.required)}
-                    />
+                    <>
+                      <TextField
+                        label="Speaker"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
+                        error={
+                          (formState.dirtyFields.speaker ||
+                            formState.touchedFields.speaker) &&
+                          !formState.isSubmitting &&
+                          Boolean(
+                            formState.errors.speaker?.types?.required ||
+                              formState.errors.speaker?.types
+                                ?.debounceValidation
+                          )
+                        }
+                        {...field}
+                      />
+                      {(formState.dirtyFields.speaker ||
+                        formState.touchedFields.speaker) &&
+                        !formState.isSubmitting && (
+                          <>
+                            {formState.validatingFields.speaker && (
+                              <div
+                                style={{ color: "blue", fontSize: "0.8rem" }}
+                              >
+                                Validating...
+                              </div>
+                            )}
+                            {!formState.validatingFields.speaker &&
+                              formState.errors.speaker?.types?.required && (
+                                <div style={{ color: "red", fontSize: "0.8rem" }}>
+                                  {formState.errors.speaker.types.required}
+                                </div>
+                              )}
+                            {!formState.validatingFields.speaker &&
+                              formState.errors.speaker?.types
+                                ?.debounceValidation && (
+                                <div style={{ color: "red", fontSize: "0.8rem" }}>
+                                  {
+                                    formState.errors.speaker.types
+                                      .debounceValidation
+                                  }
+                                </div>
+                              )}
+                          </>
+                        )}
+                    </>
                   )}
                 />
                 <Controller
@@ -190,23 +270,40 @@ const SessionForm: React.FC = () => {
                     required: "This is required",
                   }}
                   render={({ field }) => (
-                    <TextField
-                      label="Priority"
-                      variant="outlined"
-                      select={true}
-                      fullWidth
-                      helperText={formState.errors.priority?.types?.required}
-                      error={Boolean(
-                        formState.errors.priority?.types?.required
-                      )}
-                      {...field}
-                    >
-                      {prioritList.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    <>
+                      <TextField
+                        label="Priority"
+                        variant="outlined"
+                        select={true}
+                        fullWidth
+                        required
+                        sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
+                        error={
+                          (formState.dirtyFields.priority ||
+                            formState.touchedFields.priority) &&
+                          !formState.isSubmitting &&
+                          Boolean(formState.errors.priority?.types?.required)
+                        }
+                        {...field}
+                      >
+                        {prioritList.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                      {(formState.dirtyFields.priority ||
+                        formState.touchedFields.priority) &&
+                        !formState.isSubmitting && (
+                          <>
+                            {formState.errors.priority?.types?.required && (
+                              <div style={{ color: "red", fontSize: "0.8rem" }}>
+                                {formState.errors.priority.types.required}
+                              </div>
+                            )}
+                          </>
+                        )}
+                    </>
                   )}
                 />
                 <Button
