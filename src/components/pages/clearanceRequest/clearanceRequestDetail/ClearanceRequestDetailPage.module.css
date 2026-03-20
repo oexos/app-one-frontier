@@ -1,0 +1,35 @@
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.printHeader {
+  display: none;
+}
+
+.printCertification {
+  display: none;
+}
+
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+
+  .printHeader {
+    display: block;
+  }
+
+  .printCertification {
+    display: block;
+  }
+
+  .container {
+    background-color: white;
+  }
+
+  .printArea {
+    box-shadow: none;
+    border: none;
+  }
+}

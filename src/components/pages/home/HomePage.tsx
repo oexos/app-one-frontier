@@ -16,7 +16,7 @@ const HomePage: React.FC = () => {
     try {
       await instance.loginPopup();
       //https://reactrouter.com/start/declarative/installation
-      navigate("/session");
+      navigate("/dashboard");
     } catch (error: unknown) {
       console.log(error);
     }
@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className={style.grid}>
-      <h2>APP ONE</h2>
+      <h2>BarangayConnect</h2>
       {authenticationContent}
     </div>
   );
