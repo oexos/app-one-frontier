@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 12px 16px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchBar {
+  padding: 4px 16px 8px;
+}
+
+.categoryTabs {
+  padding: 0 16px 8px;
+  display: flex;
+  overflow-x: auto;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.categoryTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.list {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.productCard {
+  border-radius: 8px !important;
+}
