@@ -131,7 +131,7 @@ const InventoryPage: React.FC = () => {
 
       <Dialog open={restockDialog !== null} onClose={() => setRestockDialog(null)} fullWidth maxWidth="xs">
         <DialogTitle>Restock: {restockDialog?.name}</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 3 }}>
           <Typography variant="body2" color="text.secondary">
             Current stock: {restockDialog?.quantity}
           </Typography>
