@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import {
   Typography, Card, CardContent, IconButton, Checkbox, Button, TextField,
@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { searchProducts, bulkPriceAdjust, ProductResponse } from "../../product/productApiService";
+import InfiniteScrollList from "../../../shared/InfiniteScrollList";
 import { LayoutContext } from "../../../layout/AuthenticatedLayout";
 import style from "./QuickPriceAdjustPage.module.css";
 
@@ -20,12 +21,36 @@ const QuickPriceAdjustPage: React.FC = () => {
   const [costPriceAction, setCostPriceAction] = useState("NO_CHANGE");
   const [costPriceAmount, setCostPriceAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const loadProducts = useCallback(async (pageNum: number, append: boolean) => {
+    setIsFetching(true);
+    try {
+      const res = await searchProducts({ page: pageNum, size: 20 });
+      if (append) {
+        setProducts((prev) => [...prev, ...res.data.content]);
+      } else {
+        setProducts(res.data.content);
+      }
+      setHasNext(res.data.hasNext);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsFetching(false);
+    }
+  }, []);
 
   useEffect(() => {
-    searchProducts({ size: 100 })
-      .then((res) => setProducts(res.data.content))
-      .catch(console.error);
-  }, []);
+    loadProducts(0, false);
+  }, [loadProducts]);
+
+  const fetchNextPage = () => {
+    const next = page + 1;
+    setPage(next);
+    loadProducts(next, true);
+  };
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) => {
@@ -84,19 +109,21 @@ const QuickPriceAdjustPage: React.FC = () => {
 
         {!selectAll && (
           <div className={style.productList}>
-            {products.map((p) => (
-              <Card key={p.id} onClick={() => toggleSelect(p.id)} sx={{ "&&": { overflow: "visible" }, cursor: "pointer", borderRadius: 2, mb: 0.5 }}>
-                <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 }, display: "flex", alignItems: "center", gap: 1 }}>
-                  <Checkbox checked={selectedIds.has(p.id)} size="small" />
-                  <div style={{ flex: 1 }}>
-                    <Typography variant="body2" fontWeight={500}>{p.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Sell: P{p.sellingPrice.toFixed(2)} | Cost: P{p.costPrice.toFixed(2)}
-                    </Typography>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <InfiniteScrollList fetchNextPage={fetchNextPage} hasNextPage={hasNext} isLoading={isFetching}>
+              {products.map((p) => (
+                <Card key={p.id} className={style.productCard} onClick={() => toggleSelect(p.id)} sx={{ "&&": { overflow: "visible" } }}>
+                  <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 }, display: "flex", alignItems: "center", gap: 1 }}>
+                    <Checkbox checked={selectedIds.has(p.id)} size="small" />
+                    <div style={{ flex: 1 }}>
+                      <Typography variant="body2" fontWeight={500}>{p.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Sell: P{p.sellingPrice.toFixed(2)} | Cost: P{p.costPrice.toFixed(2)}
+                      </Typography>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </InfiniteScrollList>
           </div>
         )}
 
