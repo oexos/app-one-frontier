@@ -1,12 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../../redux-toolkit/store";
-import { incrementItem, decrementItem, removeFromCart, clearCart, setCartOpen } from "../sellSlice";
+import { incrementItem, decrementItem, setItemQuantity, removeFromCart, clearCart, setCartOpen } from "../sellSlice";
 import { triggerReportRefresh } from "../../report/reportSlice";
 import { triggerProductRefresh } from "../../product/productSlice";
 import { createSale } from "../sellApiService";
 import dayjs from "dayjs";
 import {
-  Drawer, Typography, IconButton, Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions,
+  Drawer, Typography, IconButton, Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -29,6 +29,8 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
   const cartItemCount = useSelector((state: RootState) => state.sell.cartItemCount);
   const [clearConfirm, setClearConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editQty, setEditQty] = useState("");
 
   const handleCompleteSale = async () => {
     setIsSubmitting(true);
@@ -52,6 +54,20 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const startEditing = (productId: number, currentQty: number) => {
+    setEditingId(productId);
+    setEditQty(String(currentQty));
+  };
+
+  const commitEdit = (productId: number, availableStock: number) => {
+    const parsed = parseInt(editQty);
+    if (!isNaN(parsed) && parsed >= 1) {
+      dispatch(setItemQuantity({ productId, quantity: Math.min(parsed, availableStock) }));
+    }
+    setEditingId(null);
+    setEditQty("");
   };
 
   return (
@@ -79,22 +95,68 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
                   <Typography variant="body2" color="text.secondary">
                     P{item.sellingPrice.toFixed(2)} x {item.quantity} = P{item.subtotal.toFixed(2)}
                   </Typography>
+                  <Tooltip title="Total stock in your inventory" arrow>
+                    <Typography variant="caption" color="text.secondary">
+                      Available: {item.availableStock}
+                    </Typography>
+                  </Tooltip>
                 </div>
                 <div className={style.itemActions}>
-                  <IconButton size="small" onClick={() => dispatch(decrementItem(item.productId))}>
-                    <RemoveIcon fontSize="small" />
-                  </IconButton>
-                  <Typography variant="body1" fontWeight={600} sx={{ mx: 1 }}>{item.quantity}</Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => dispatch(incrementItem(item.productId))}
-                    disabled={item.quantity >= item.availableStock}
-                  >
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" color="error" onClick={() => dispatch(removeFromCart(item.productId))}>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+                  <Tooltip title="Decrease quantity" arrow>
+                    <IconButton size="small" onClick={() => dispatch(decrementItem(item.productId))}>
+                      <RemoveIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  {editingId === item.productId ? (
+                    <TextField
+                      size="small"
+                      type="number"
+                      value={editQty}
+                      onChange={(e) => setEditQty(e.target.value)}
+                      onBlur={() => commitEdit(item.productId, item.availableStock)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") commitEdit(item.productId, item.availableStock);
+                        if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
+                      }}
+                      inputProps={{ inputMode: "numeric", min: 1, style: { textAlign: "center", width: 40, padding: "4px 0" } }}
+                      autoFocus
+                      sx={{ mx: 0.5, width: 56 }}
+                    />
+                  ) : (
+                    <Tooltip title="Tap to type quantity directly" arrow>
+                      <Typography
+                        variant="body1"
+                        fontWeight={600}
+                        onClick={() => startEditing(item.productId, item.quantity)}
+                        sx={{
+                          mx: 1,
+                          cursor: "pointer",
+                          minWidth: 28,
+                          textAlign: "center",
+                          borderBottom: "1px dashed #999",
+                          userSelect: "none",
+                        }}
+                      >
+                        {item.quantity}
+                      </Typography>
+                    </Tooltip>
+                  )}
+                  <Tooltip title="Increase quantity" arrow>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={() => dispatch(incrementItem(item.productId))}
+                        disabled={item.quantity >= item.availableStock}
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title="Remove from cart" arrow>
+                    <IconButton size="small" color="error" onClick={() => dispatch(removeFromCart(item.productId))}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </div>
               </div>
             ))
@@ -108,25 +170,31 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
               <Typography variant="h6" fontWeight={700}>Total</Typography>
               <Typography variant="h6" fontWeight={700} color="primary">P{cartTotal.toFixed(2)}</Typography>
             </div>
-            <Button
-              variant="contained"
-              fullWidth
-              size="large"
-              onClick={handleCompleteSale}
-              disabled={isSubmitting}
-              sx={{ mb: 1, py: 1.2, borderRadius: 2 }}
-            >
-              {isSubmitting ? "Processing..." : "Complete Sale"}
-            </Button>
-            <Button
-              variant="outlined"
-              fullWidth
-              color="error"
-              onClick={() => setClearConfirm(true)}
-              sx={{ borderRadius: 2 }}
-            >
-              Clear Cart
-            </Button>
+            <Tooltip title="Finalize sale and deduct inventory" arrow>
+              <span>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  size="large"
+                  onClick={handleCompleteSale}
+                  disabled={isSubmitting}
+                  sx={{ mb: 1, py: 1.2, borderRadius: 2 }}
+                >
+                  {isSubmitting ? "Processing..." : "Complete Sale"}
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title="Remove all items from cart" arrow>
+              <Button
+                variant="outlined"
+                fullWidth
+                color="error"
+                onClick={() => setClearConfirm(true)}
+                sx={{ borderRadius: 2 }}
+              >
+                Clear Cart
+              </Button>
+            </Tooltip>
           </div>
         )}
       </Drawer>

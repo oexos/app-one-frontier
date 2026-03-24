@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from "react-router";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux-toolkit/store";
 import { searchProducts, getCategories, ProductResponse, CategoryResponse } from "./productApiService";
-import { Card, CardContent, Typography, TextField, InputAdornment, Chip, IconButton, Fab } from "@mui/material";
+import { Card, CardContent, Typography, TextField, InputAdornment, Chip, IconButton, Fab, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -68,29 +68,33 @@ const ProductPage: React.FC = () => {
     <div className={style.container}>
       <div className={style.header}>
         <Typography variant="h6" fontWeight={600}>Products</Typography>
-        <Chip
-          label="Categories"
-          onClick={() => navigate("/categories")}
-          variant="outlined"
-          size="small"
-        />
+        <Tooltip title="Manage your product categories" arrow>
+          <Chip
+            label="Categories"
+            onClick={() => navigate("/categories")}
+            variant="outlined"
+            size="small"
+          />
+        </Tooltip>
       </div>
 
       <div className={style.searchBar}>
-        <TextField
-          size="small"
-          placeholder="Search products..."
-          fullWidth
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+        <Tooltip title="Search products by name" arrow>
+          <TextField
+            size="small"
+            placeholder="Search products..."
+            fullWidth
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Tooltip>
       </div>
 
       {categories.length > 0 && (
@@ -138,9 +142,11 @@ const ProductPage: React.FC = () => {
                     </Typography>
                   )}
                 </div>
-                <IconButton onClick={() => navigate(`/products/${product.id}/edit`)}>
-                  <EditIcon />
-                </IconButton>
+                <Tooltip title="Edit product details" arrow>
+                  <IconButton onClick={() => navigate(`/products/${product.id}/edit`)}>
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
               </CardContent>
             </Card>
           ))}
@@ -152,22 +158,24 @@ const ProductPage: React.FC = () => {
         </div>
       </InfiniteScrollList>
 
-      <Fab
-        onClick={() => navigate("/products/add")}
-        sx={{
-          "&&": {
-            position: "fixed",
-            bottom: 72,
-            right: 16,
-            backgroundColor: "#1976d2",
-            color: "#fff",
-          },
-          zIndex: 99,
-          "&:hover": { backgroundColor: "#1565c0" },
-        }}
-      >
-        <AddIcon />
-      </Fab>
+      <Tooltip title="Add a new product" arrow>
+        <Fab
+          onClick={() => navigate("/products/add")}
+          sx={{
+            "&&": {
+              position: "fixed",
+              bottom: 72,
+              right: 16,
+              backgroundColor: "#1976d2",
+              color: "#fff",
+            },
+            zIndex: 99,
+            "&:hover": { backgroundColor: "#1565c0" },
+          }}
+        >
+          <AddIcon />
+        </Fab>
+      </Tooltip>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux-toolkit/store";
 import { addToCart, setCartOpen, CartItem } from "./sellSlice";
 import { searchProducts, getCategories, ProductResponse, CategoryResponse } from "../product/productApiService";
-import { Card, CardContent, Typography, TextField, InputAdornment, Chip, Badge, Snackbar, Alert } from "@mui/material";
+import { Card, CardContent, Typography, TextField, InputAdornment, Chip, Badge, Snackbar, Alert, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
@@ -122,63 +122,70 @@ const SellPage: React.FC = () => {
 
         {(hasAnyProducts || search) && (
           <div className={style.searchBar}>
-            <TextField
-              size="small"
-              placeholder="Search products..."
-              fullWidth
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+            <Tooltip title="Search products by name" arrow>
+              <TextField
+                size="small"
+                placeholder="Search products..."
+                fullWidth
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Tooltip>
           </div>
         )}
 
         {categories.length > 0 && (
           <div className={style.categoryTabs}>
-          <Chip
-            label="All"
-            onClick={() => setSelectedCategory(null)}
-            size="small"
-            sx={{
-              "&&": {
-                backgroundColor: selectedCategory === null ? "#1976d2" : "#e0e0e0",
-                color: selectedCategory === null ? "#fff" : "#333",
-              },
-              fontWeight: selectedCategory === null ? 600 : 400,
-            }}
-          />
-          <Chip
-            label="Favorites"
-            onClick={() => setSelectedCategory(-1)}
-            size="small"
-            sx={{
-              "&&": {
-                backgroundColor: selectedCategory === -1 ? "#1976d2" : "#e0e0e0",
-                color: selectedCategory === -1 ? "#fff" : "#333",
-              },
-              fontWeight: selectedCategory === -1 ? 600 : 400,
-            }}
-          />
-          {categories.map((cat) => (
+          <Tooltip title="Show all products" arrow>
             <Chip
-              key={cat.id}
-              label={cat.name}
-              onClick={() => setSelectedCategory(cat.id)}
+              label="All"
+              onClick={() => setSelectedCategory(null)}
               size="small"
               sx={{
                 "&&": {
-                  backgroundColor: selectedCategory === cat.id ? "#1976d2" : "#e0e0e0",
-                  color: selectedCategory === cat.id ? "#fff" : "#333",
+                  backgroundColor: selectedCategory === null ? "#1976d2" : "#e0e0e0",
+                  color: selectedCategory === null ? "#fff" : "#333",
                 },
-                fontWeight: selectedCategory === cat.id ? 600 : 400,
+                fontWeight: selectedCategory === null ? 600 : 400,
               }}
             />
+          </Tooltip>
+          <Tooltip title="Show products marked as favorite" arrow>
+            <Chip
+              label="Favorites"
+              onClick={() => setSelectedCategory(-1)}
+              size="small"
+              sx={{
+                "&&": {
+                  backgroundColor: selectedCategory === -1 ? "#1976d2" : "#e0e0e0",
+                  color: selectedCategory === -1 ? "#fff" : "#333",
+                },
+                fontWeight: selectedCategory === -1 ? 600 : 400,
+              }}
+            />
+          </Tooltip>
+          {categories.map((cat) => (
+            <Tooltip key={cat.id} title="Filter by this category" arrow>
+              <Chip
+                label={cat.name}
+                onClick={() => setSelectedCategory(cat.id)}
+                size="small"
+                sx={{
+                  "&&": {
+                    backgroundColor: selectedCategory === cat.id ? "#1976d2" : "#e0e0e0",
+                    color: selectedCategory === cat.id ? "#fff" : "#333",
+                  },
+                  fontWeight: selectedCategory === cat.id ? 600 : 400,
+                }}
+              />
+            </Tooltip>
           ))}
         </div>
       )}
@@ -218,16 +225,18 @@ const SellPage: React.FC = () => {
       </InfiniteScrollList>
 
       {cartItemCount > 0 && (
-        <div className={style.cartBar} onClick={() => dispatch(setCartOpen(true))}>
-          <Badge badgeContent={cartItemCount} color="secondary">
-            <Typography variant="body1" fontWeight={600} color="white">
-              View Cart
+        <Tooltip title="Tap to view and manage your cart" arrow>
+          <div className={style.cartBar} onClick={() => dispatch(setCartOpen(true))}>
+            <Badge badgeContent={cartItemCount} color="secondary">
+              <Typography variant="body1" fontWeight={600} color="white">
+                View Cart
+              </Typography>
+            </Badge>
+            <Typography variant="body1" fontWeight={700} color="white">
+              P{cartTotal.toFixed(2)}
             </Typography>
-          </Badge>
-          <Typography variant="body1" fontWeight={700} color="white">
-            P{cartTotal.toFixed(2)}
-          </Typography>
-        </div>
+          </div>
+        </Tooltip>
       )}
 
       <CartPanel

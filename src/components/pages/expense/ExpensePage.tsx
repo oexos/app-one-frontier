@@ -8,7 +8,7 @@ import { searchExpenses, createExpense, updateExpense, deleteExpense, ExpenseRes
 import dayjs from "dayjs";
 import {
   Typography, Card, CardContent, Fab, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Button,
+  TextField, Button, Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -133,12 +133,16 @@ const ExpensePage: React.FC = () => {
                   </Typography>
                 </div>
                 <div>
-                  <IconButton size="small" onClick={() => openEditDialog(expense)}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton size="small" color="error" onClick={() => setDeleteConfirm(expense.id)}>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+                  <Tooltip title="Edit this expense" arrow>
+                    <IconButton size="small" onClick={() => openEditDialog(expense)}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete this expense" arrow>
+                    <IconButton size="small" color="error" onClick={() => setDeleteConfirm(expense.id)}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </div>
               </CardContent>
             </Card>
@@ -151,9 +155,11 @@ const ExpensePage: React.FC = () => {
         </div>
       </InfiniteScrollList>
 
-      <Fab onClick={openAddDialog} sx={{ "&&": { position: "fixed", bottom: 72, right: 16, backgroundColor: "#1976d2", color: "#fff" }, zIndex: 99, "&:hover": { backgroundColor: "#1565c0" } }}>
-        <AddIcon />
-      </Fab>
+      <Tooltip title="Add a new expense" arrow>
+        <Fab onClick={openAddDialog} sx={{ "&&": { position: "fixed", bottom: 72, right: 16, backgroundColor: "#1976d2", color: "#fff" }, zIndex: 99, "&:hover": { backgroundColor: "#1565c0" } }}>
+          <AddIcon />
+        </Fab>
+      </Tooltip>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>{editingExpense ? "Edit Expense" : "Add Expense"}</DialogTitle>

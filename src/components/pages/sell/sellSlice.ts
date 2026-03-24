@@ -76,6 +76,16 @@ const sellSlice = createSlice({
         recalcTotals(state);
       }
     },
+    setItemQuantity: (state, action: PayloadAction<{ productId: number; quantity: number }>) => {
+      const { productId, quantity } = action.payload;
+      const item = state.cartItems.find((i) => i.productId === productId);
+      if (item) {
+        const clamped = Math.max(1, Math.min(quantity, item.availableStock));
+        item.quantity = clamped;
+        item.subtotal = item.sellingPrice * clamped;
+        recalcTotals(state);
+      }
+    },
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.cartItems = state.cartItems.filter((i) => i.productId !== action.payload);
       recalcTotals(state);
@@ -92,5 +102,5 @@ const sellSlice = createSlice({
   },
 });
 
-export const { addToCart, incrementItem, decrementItem, removeFromCart, clearCart, setCartOpen } = sellSlice.actions;
+export const { addToCart, incrementItem, decrementItem, setItemQuantity, removeFromCart, clearCart, setCartOpen } = sellSlice.actions;
 export default sellSlice.reducer;

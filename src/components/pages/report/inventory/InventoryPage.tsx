@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { searchProducts, restockProduct, ProductResponse } from "../../product/productApiService";
 import {
-  Typography, Card, CardContent, IconButton, Chip, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
+  Typography, Card, CardContent, IconButton, Chip, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
@@ -77,15 +77,21 @@ const InventoryPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/reports")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to reports" arrow>
+          <IconButton onClick={() => navigate("/reports")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600}>Inventory</Typography>
       </div>
 
       <div className={style.tabs}>
-        <Chip label="Low Stock" onClick={() => setLowStockOnly(true)} sx={{ "&&": { backgroundColor: lowStockOnly ? "#d32f2f" : "#e0e0e0", color: lowStockOnly ? "#fff" : "#333" }, fontWeight: lowStockOnly ? 600 : 400 }} />
-        <Chip label="All Products" onClick={() => setLowStockOnly(false)} sx={{ "&&": { backgroundColor: !lowStockOnly ? "#1976d2" : "#e0e0e0", color: !lowStockOnly ? "#fff" : "#333" }, fontWeight: !lowStockOnly ? 600 : 400 }} />
+        <Tooltip title="Products at or below their alert threshold" arrow>
+          <Chip label="Low Stock" onClick={() => setLowStockOnly(true)} sx={{ "&&": { backgroundColor: lowStockOnly ? "#d32f2f" : "#e0e0e0", color: lowStockOnly ? "#fff" : "#333" }, fontWeight: lowStockOnly ? 600 : 400 }} />
+        </Tooltip>
+        <Tooltip title="View all products with stock info" arrow>
+          <Chip label="All Products" onClick={() => setLowStockOnly(false)} sx={{ "&&": { backgroundColor: !lowStockOnly ? "#1976d2" : "#e0e0e0", color: !lowStockOnly ? "#fff" : "#333" }, fontWeight: !lowStockOnly ? 600 : 400 }} />
+        </Tooltip>
       </div>
 
       <InfiniteScrollList fetchNextPage={fetchNextPage} hasNextPage={hasNext} isLoading={isLoading}>
@@ -95,9 +101,11 @@ const InventoryPage: React.FC = () => {
               <CardContent sx={{ p: 2, "&:last-child": { pb: 2 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <Typography variant="body1" fontWeight={500}>{product.name}</Typography>
-                  <Typography variant="body2" color={product.isLowStock ? "error" : "text.secondary"}>
-                    Stock: {product.quantity} / Threshold: {product.lowStockThreshold}
-                  </Typography>
+                  <Tooltip title="Current stock vs low stock alert level" arrow>
+                    <Typography variant="body2" color={product.isLowStock ? "error" : "text.secondary"}>
+                      Stock: {product.quantity} / Threshold: {product.lowStockThreshold}
+                    </Typography>
+                  </Tooltip>
                   <Typography variant="caption" color="text.secondary">
                     Cost: P{product.costPrice.toFixed(2)} | Sell: P{product.sellingPrice.toFixed(2)}
                   </Typography>

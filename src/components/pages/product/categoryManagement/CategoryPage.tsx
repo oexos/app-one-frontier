@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux-toolkit/store";
 import { triggerProductRefresh } from "../productSlice";
 import {
-  Typography, Card, CardContent, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
+  Typography, Card, CardContent, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
@@ -70,16 +70,20 @@ const CategoryPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/products")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to products" arrow>
+          <IconButton onClick={() => navigate("/products")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>Categories</Typography>
-        <Button
-          startIcon={<AddIcon />}
-          onClick={() => { setEditingId(null); setCategoryName(""); setDialogOpen(true); }}
-        >
-          Add
-        </Button>
+        <Tooltip title="Add a new category" arrow>
+          <Button
+            startIcon={<AddIcon />}
+            onClick={() => { setEditingId(null); setCategoryName(""); setDialogOpen(true); }}
+          >
+            Add
+          </Button>
+        </Tooltip>
       </div>
 
       <div className={style.list}>
@@ -88,15 +92,21 @@ const CategoryPage: React.FC = () => {
             <CardContent sx={{ p: 2, "&:last-child": { pb: 2 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <Typography variant="body1" fontWeight={500}>{cat.name}</Typography>
-                <Typography variant="caption" color="text.secondary">{cat.productCount} products</Typography>
+                <Tooltip title="Number of products in this category" arrow>
+                  <Typography variant="caption" color="text.secondary">{cat.productCount} products</Typography>
+                </Tooltip>
               </div>
               <div>
-                <IconButton onClick={() => { setEditingId(cat.id); setCategoryName(cat.name); setDialogOpen(true); }}>
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton color="error" onClick={() => setDeleteConfirm(cat.id)}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
+                <Tooltip title="Rename this category" arrow>
+                  <IconButton onClick={() => { setEditingId(cat.id); setCategoryName(cat.name); setDialogOpen(true); }}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete this category" arrow>
+                  <IconButton color="error" onClick={() => setDeleteConfirm(cat.id)}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </div>
             </CardContent>
           </Card>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Card, CardContent, Typography, CardActionArea } from "@mui/material";
+import { Card, CardContent, Typography, CardActionArea, Tooltip } from "@mui/material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import InventoryIcon from "@mui/icons-material/Inventory2";
 import HistoryIcon from "@mui/icons-material/History";
@@ -62,9 +62,11 @@ const ReportHubPage: React.FC = () => {
               <div>
                 <Typography variant="body1" fontWeight={600}>Inventory / Low Stock</Typography>
                 {lowStockCount !== null && (
-                  <Typography variant="body2" color={lowStockCount > 0 ? "error" : "text.secondary"}>
-                    {lowStockCount > 0 ? `${lowStockCount} products low on stock` : "All stock levels OK"}
-                  </Typography>
+                  <Tooltip title="Products at or below their stock alert threshold" arrow>
+                    <Typography variant="body2" color={lowStockCount > 0 ? "error" : "text.secondary"}>
+                      {lowStockCount > 0 ? `${lowStockCount} products low on stock` : "All stock levels OK"}
+                    </Typography>
+                  </Tooltip>
                 )}
               </div>
             </CardContent>
@@ -78,9 +80,11 @@ const ReportHubPage: React.FC = () => {
               <div>
                 <Typography variant="body1" fontWeight={600}>Sales History</Typography>
                 {todaySaleCount !== null && (
-                  <Typography variant="body2" color="text.secondary">
-                    {todaySaleCount} sales today
-                  </Typography>
+                  <Tooltip title="Number of sales transactions today" arrow>
+                    <Typography variant="body2" color="text.secondary">
+                      {todaySaleCount} sales today
+                    </Typography>
+                  </Tooltip>
                 )}
               </div>
             </CardContent>

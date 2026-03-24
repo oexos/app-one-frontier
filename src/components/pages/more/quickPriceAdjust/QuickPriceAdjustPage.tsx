@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import {
   Typography, Card, CardContent, IconButton, Checkbox, Button, TextField,
-  Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Divider,
+  Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Divider, Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { searchProducts, bulkPriceAdjust, ProductResponse } from "../../product/productApiService";
@@ -66,17 +66,21 @@ const QuickPriceAdjustPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/more")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to more options" arrow>
+          <IconButton onClick={() => navigate("/more")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600}>Quick Price Adjust</Typography>
       </div>
 
       <div className={style.content}>
-        <FormControlLabel
-          control={<Checkbox checked={selectAll} onChange={(e) => setSelectAll(e.target.checked)} />}
-          label="Select All Products"
-        />
+        <Tooltip title="Apply price changes to all products in your store" arrow>
+          <FormControlLabel
+            control={<Checkbox checked={selectAll} onChange={(e) => setSelectAll(e.target.checked)} />}
+            label="Select All Products"
+          />
+        </Tooltip>
 
         {!selectAll && (
           <div className={style.productList}>
@@ -144,16 +148,20 @@ const QuickPriceAdjustPage: React.FC = () => {
           )}
         </FormControl>
 
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          sx={{ mt: 3, py: 1.2, borderRadius: 2 }}
-          onClick={handleApply}
-          disabled={!hasSelection || !hasAction || isLoading}
-        >
-          {isLoading ? "Applying..." : "Apply Price Changes"}
-        </Button>
+        <Tooltip title="Apply the selected price changes" arrow>
+          <span>
+            <Button
+              variant="contained"
+              fullWidth
+              size="large"
+              sx={{ mt: 3, py: 1.2, borderRadius: 2 }}
+              onClick={handleApply}
+              disabled={!hasSelection || !hasAction || isLoading}
+            >
+              {isLoading ? "Applying..." : "Apply Price Changes"}
+            </Button>
+          </span>
+        </Tooltip>
       </div>
     </div>
   );

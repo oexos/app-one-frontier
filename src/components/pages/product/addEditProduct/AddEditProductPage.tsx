@@ -6,7 +6,7 @@ import { triggerProductRefresh } from "../productSlice";
 import { useForm, Controller } from "react-hook-form";
 import {
   TextField, Button, Card, CardContent, Typography, Switch, FormControlLabel,
-  Select, MenuItem, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
+  Select, MenuItem, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -129,16 +129,20 @@ const AddEditProductPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/products")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to products" arrow>
+          <IconButton onClick={() => navigate("/products")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600}>
           {isEdit ? "Edit Product" : "Add Product"}
         </Typography>
         {isEdit && (
-          <IconButton color="error" onClick={() => setDeleteConfirm(true)}>
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Delete this product permanently" arrow>
+            <IconButton color="error" onClick={() => setDeleteConfirm(true)}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         )}
       </div>
 
@@ -222,7 +226,7 @@ const AddEditProductPage: React.FC = () => {
             }}
             render={({ field }) => (
               <TextField
-                label="Initial Stock"
+                label="Stock"
                 fullWidth
                 required
                 type="number"
@@ -247,6 +251,7 @@ const AddEditProductPage: React.FC = () => {
                 type="number"
                 inputProps={{ inputMode: "numeric", min: 0, step: 1 }}
                 onKeyDown={(e) => { if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault(); }}
+                helperText="Alert when stock falls to this level"
                 {...field}
               />
             )}
@@ -272,10 +277,12 @@ const AddEditProductPage: React.FC = () => {
             name="isFavorite"
             control={control}
             render={({ field }) => (
-              <FormControlLabel
-                control={<Switch checked={field.value} onChange={field.onChange} />}
-                label="Favorite (pinned to Sell screen)"
-              />
+              <Tooltip title="Favorite products appear first in the Sell screen Favorites tab" arrow>
+                <FormControlLabel
+                  control={<Switch checked={field.value} onChange={field.onChange} />}
+                  label="Favorite (pinned to Sell screen)"
+                />
+              </Tooltip>
             )}
           />
 

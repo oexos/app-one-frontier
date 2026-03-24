@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Typography, Card, CardContent, IconButton } from "@mui/material";
+import { Typography, Card, CardContent, IconButton, Tooltip } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -29,23 +29,33 @@ const DailySummaryPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/reports")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to reports" arrow>
+          <IconButton onClick={() => navigate("/reports")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600}>Daily Summary</Typography>
       </div>
 
       <div className={style.dateNav}>
-        <IconButton onClick={() => setDate(date.subtract(1, "day"))} disabled={isAtLimit}>
-          <ChevronLeftIcon />
-        </IconButton>
+        <Tooltip title="Previous day" arrow>
+          <span>
+            <IconButton onClick={() => setDate(date.subtract(1, "day"))} disabled={isAtLimit}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
         <Typography variant="body1" fontWeight={500}>
           {date.format("ddd, MMM D, YYYY")}
           {isToday && " (Today)"}
         </Typography>
-        <IconButton onClick={() => setDate(date.add(1, "day"))} disabled={isToday}>
-          <ChevronRightIcon />
-        </IconButton>
+        <Tooltip title={isToday ? "Already showing today" : "Next day"} arrow>
+          <span>
+            <IconButton onClick={() => setDate(date.add(1, "day"))} disabled={isToday}>
+              <ChevronRightIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
       </div>
 
       {isLoading ? (
@@ -54,27 +64,35 @@ const DailySummaryPage: React.FC = () => {
         <div className={style.cards}>
           <Card>
             <CardContent>
-              <Typography variant="body2" color="text.secondary">Revenue</Typography>
+              <Tooltip title="Total amount from completed sales (excludes voided)" arrow>
+                <Typography variant="body2" color="text.secondary">Revenue</Typography>
+              </Tooltip>
               <Typography variant="h5" fontWeight={700} color="primary">P{summary.revenue.toFixed(2)}</Typography>
             </CardContent>
           </Card>
           <div className={style.row}>
             <Card sx={{ flex: 1 }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Product Profit</Typography>
+                <Tooltip title="Revenue minus cost of goods sold" arrow>
+                  <Typography variant="caption" color="text.secondary">Product Profit</Typography>
+                </Tooltip>
                 <Typography variant="h6" fontWeight={600}>P{summary.productProfit.toFixed(2)}</Typography>
               </CardContent>
             </Card>
             <Card sx={{ flex: 1 }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Expenses</Typography>
+                <Tooltip title="Total expenses logged for this date" arrow>
+                  <Typography variant="caption" color="text.secondary">Expenses</Typography>
+                </Tooltip>
                 <Typography variant="h6" fontWeight={600} color="error">-P{summary.totalExpenses.toFixed(2)}</Typography>
               </CardContent>
             </Card>
           </div>
           <Card>
             <CardContent>
-              <Typography variant="body2" color="text.secondary">Actual Profit</Typography>
+              <Tooltip title="Product profit minus total expenses" arrow>
+                <Typography variant="body2" color="text.secondary">Actual Profit</Typography>
+              </Tooltip>
               <Typography variant="h5" fontWeight={700} color={summary.actualProfit >= 0 ? "success.main" : "error"}>
                 P{summary.actualProfit.toFixed(2)}
               </Typography>
@@ -83,13 +101,17 @@ const DailySummaryPage: React.FC = () => {
           <div className={style.row}>
             <Card sx={{ flex: 1 }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Transactions</Typography>
+                <Tooltip title="Number of completed sales (excludes voided)" arrow>
+                  <Typography variant="caption" color="text.secondary">Transactions</Typography>
+                </Tooltip>
                 <Typography variant="h6" fontWeight={600}>{summary.transactionCount}</Typography>
               </CardContent>
             </Card>
             <Card sx={{ flex: 1 }}>
               <CardContent>
-                <Typography variant="caption" color="text.secondary">Items Sold</Typography>
+                <Tooltip title="Total quantity of individual items sold" arrow>
+                  <Typography variant="caption" color="text.secondary">Items Sold</Typography>
+                </Tooltip>
                 <Typography variant="h6" fontWeight={600}>{summary.itemsSold}</Typography>
               </CardContent>
             </Card>
@@ -98,7 +120,9 @@ const DailySummaryPage: React.FC = () => {
           {summary.topSellers.length > 0 && (
             <Card>
               <CardContent>
-                <Typography variant="body1" fontWeight={600} gutterBottom>Top Sellers</Typography>
+                <Tooltip title="Products ranked by quantity sold today" arrow>
+                  <Typography variant="body1" fontWeight={600} gutterBottom>Top Sellers</Typography>
+                </Tooltip>
                 {summary.topSellers.map((ts, i) => (
                   <div key={i} className={style.topSeller}>
                     <Typography variant="body2">{i + 1}. {ts.productName}</Typography>

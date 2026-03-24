@@ -6,7 +6,7 @@ import { triggerReportRefresh } from "../reportSlice";
 import { triggerProductRefresh } from "../../product/productSlice";
 import { searchSales, voidSale, SaleResponse } from "../../sell/sellApiService";
 import {
-  Typography, Card, CardContent, IconButton, Button, Chip, Dialog, DialogTitle, DialogContent, DialogActions,
+  Typography, Card, CardContent, IconButton, Button, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -87,22 +87,32 @@ const SalesHistoryPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/reports")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to reports" arrow>
+          <IconButton onClick={() => navigate("/reports")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600}>Sales History</Typography>
       </div>
 
       <div className={style.dateNav}>
-        <IconButton onClick={() => setDate(date.subtract(1, "day"))} disabled={isAtLimit}>
-          <ChevronLeftIcon />
-        </IconButton>
+        <Tooltip title="Previous day" arrow>
+          <span>
+            <IconButton onClick={() => setDate(date.subtract(1, "day"))} disabled={isAtLimit}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
         <Typography variant="body1" fontWeight={500}>
           {date.format("ddd, MMM D, YYYY")} {isToday && "(Today)"}
         </Typography>
-        <IconButton onClick={() => setDate(date.add(1, "day"))} disabled={isToday}>
-          <ChevronRightIcon />
-        </IconButton>
+        <Tooltip title="Next day" arrow>
+          <span>
+            <IconButton onClick={() => setDate(date.add(1, "day"))} disabled={isToday}>
+              <ChevronRightIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
       </div>
 
       <InfiniteScrollList fetchNextPage={fetchNextPage} hasNextPage={hasNext} isLoading={isLoading}>
@@ -112,11 +122,13 @@ const SalesHistoryPage: React.FC = () => {
               <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
                 <div className={style.saleHeader}>
                   <Typography variant="body1" fontWeight={600}>Sale #{sale.saleNumber}</Typography>
-                  <Chip
-                    label={sale.status}
-                    color={sale.status === "COMPLETED" ? "success" : "error"}
-                    size="small"
-                  />
+                  <Tooltip title={sale.status === "COMPLETED" ? "Sale is finalized and inventory deducted" : "Sale was cancelled and inventory restored"} arrow>
+                    <Chip
+                      label={sale.status}
+                      color={sale.status === "COMPLETED" ? "success" : "error"}
+                      size="small"
+                    />
+                  </Tooltip>
                 </div>
                 <Typography variant="body2" color="text.secondary">
                   {dayjs(sale.createdAt).format("h:mm A")} | {sale.totalItems} items
@@ -130,14 +142,16 @@ const SalesHistoryPage: React.FC = () => {
                   </Typography>
                 ))}
                 {sale.status === "COMPLETED" && isToday && (
-                  <Button
-                    color="error"
-                    size="small"
-                    sx={{ mt: 1 }}
-                    onClick={() => setVoidConfirm(sale)}
-                  >
-                    Void Sale
-                  </Button>
+                  <Tooltip title="Cancel this sale and restore inventory to stock" arrow>
+                    <Button
+                      color="error"
+                      size="small"
+                      sx={{ mt: 1 }}
+                      onClick={() => setVoidConfirm(sale)}
+                    >
+                      Void Sale
+                    </Button>
+                  </Tooltip>
                 )}
               </CardContent>
             </Card>

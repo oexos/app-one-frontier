@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { useMsal } from "@azure/msal-react";
 import { useForm, Controller } from "react-hook-form";
-import { Typography, Card, CardContent, TextField, Button, IconButton } from "@mui/material";
+import { Typography, Card, CardContent, TextField, Button, IconButton, Tooltip } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { getMyStore, updateStore } from "../../storeSetup/storeApiService";
 import { LayoutContext } from "../../../layout/AuthenticatedLayout";
@@ -68,9 +68,11 @@ const AccountSettingsPage: React.FC = () => {
   return (
     <div className={style.container}>
       <div className={style.header}>
-        <IconButton onClick={() => navigate("/more")}>
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Back to more options" arrow>
+          <IconButton onClick={() => navigate("/more")}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
         <Typography variant="h6" fontWeight={600}>Account Settings</Typography>
       </div>
 

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useMsal } from "@azure/msal-react";
-import { Card, CardContent, Typography, CardActionArea, Button } from "@mui/material";
+import { Card, CardContent, Typography, CardActionArea, Button, Tooltip } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -25,32 +25,38 @@ const MorePage: React.FC = () => {
         <Typography variant="h6" fontWeight={600}>More</Typography>
       </div>
       <div className={style.cards}>
-        <Card>
-          <CardActionArea onClick={() => navigate("/more/quick-price-adjust")}>
-            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <TuneIcon color="primary" />
-              <Typography variant="body1" fontWeight={500}>Quick Price Adjust</Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-        <Card>
-          <CardActionArea onClick={() => navigate("/more/account-settings")}>
-            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <SettingsIcon color="primary" />
-              <Typography variant="body1" fontWeight={500}>Account Settings</Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+        <Tooltip title="Bulk update selling or cost prices for multiple products at once" arrow>
+          <Card>
+            <CardActionArea onClick={() => navigate("/more/quick-price-adjust")}>
+              <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <TuneIcon color="primary" />
+                <Typography variant="body1" fontWeight={500}>Quick Price Adjust</Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Tooltip>
+        <Tooltip title="View your account info and update store name" arrow>
+          <Card>
+            <CardActionArea onClick={() => navigate("/more/account-settings")}>
+              <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <SettingsIcon color="primary" />
+                <Typography variant="body1" fontWeight={500}>Account Settings</Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Tooltip>
 
-        <Button
-          variant="outlined"
-          color="error"
-          startIcon={<LogoutIcon />}
-          onClick={handleLogout}
-          sx={{ mt: 2, mx: 2 }}
-        >
-          Logout
-        </Button>
+        <Tooltip title="Sign out of your account" arrow>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+            sx={{ mt: 2, mx: 2 }}
+          >
+            Logout
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
