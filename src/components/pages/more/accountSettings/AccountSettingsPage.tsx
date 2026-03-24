@@ -12,12 +12,38 @@ interface Inputs {
   storeName: string;
 }
 
+const isUPN = (value: string): boolean => /^[0-9a-f-]+@.*\.onmicrosoft\.com$/i.test(value);
+
 const extractEmail = (account: { username?: string; idTokenClaims?: Record<string, unknown> }): string => {
   const claims = account.idTokenClaims || {};
-  if (typeof claims.email === "string") return claims.email;
-  if (Array.isArray(claims.emails) && claims.emails.length > 0) return claims.emails[0];
+  // Check standard email claims
+  if (typeof claims.email === "string" && !isUPN(claims.email)) return claims.email;
+  if (Array.isArray(claims.emails) && claims.emails.length > 0 && !isUPN(claims.emails[0])) return claims.emails[0];
+  // Check social identity provider claims (CIAM with Google social login)
+  if (typeof claims.signInNames_emailAddress === "string") return claims.signInNames_emailAddress;
+  if (typeof claims.preferred_username === "string" && !isUPN(claims.preferred_username)) return claims.preferred_username;
+  // Fallback to username if it looks like a real email
   const username = account.username || "";
-  if (username.includes("@") && !username.match(/^[0-9a-f-]+@/)) return username;
+  if (username.includes("@") && !isUPN(username)) return username;
+  return "";
+};
+
+const decodeIdTokenEmail = (): string => {
+  try {
+    const keys = Object.keys(sessionStorage);
+    for (const key of keys) {
+      if (key.includes("idtoken")) {
+        const val = JSON.parse(sessionStorage.getItem(key) || "{}");
+        if (val.secret) {
+          const payload = JSON.parse(atob(val.secret.split(".")[1]));
+          if (typeof payload.email === "string" && !isUPN(payload.email)) return payload.email;
+          if (Array.isArray(payload.emails) && payload.emails.length > 0 && !isUPN(payload.emails[0])) return payload.emails[0];
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Failed to decode ID token", err);
+  }
   return "";
 };
 
@@ -41,13 +67,19 @@ const AccountSettingsPage: React.FC = () => {
     }
     getMyStore().then((res) => {
       reset({ storeName: res.data.storeName });
-      // Set ownerEmail first as fallback, then override with MSAL email if available
-      if (res.data.ownerEmail) {
+      // Set ownerEmail first as fallback (skip UPNs), then override with MSAL email if available
+      if (res.data.ownerEmail && !isUPN(res.data.ownerEmail)) {
         setEmail(res.data.ownerEmail);
       }
       if (accounts.length > 0) {
         const msalEmail = extractEmail(accounts[0]);
-        if (msalEmail) setEmail(msalEmail);
+        if (msalEmail) {
+          setEmail(msalEmail);
+        } else {
+          // MSAL account object may not have idTokenClaims populated — decode from cached ID token
+          const tokenEmail = decodeIdTokenEmail();
+          if (tokenEmail) setEmail(tokenEmail);
+        }
       }
     }).catch(console.error);
   }, [accounts, reset]);
@@ -92,10 +124,10 @@ const AccountSettingsPage: React.FC = () => {
           )}
           <TextField
             label="Email"
-            value={email}
+            value={email || "Signed in via Google"}
             disabled
             fullWidth
-            helperText={email.match(/^[0-9a-f-]+@/) ? "Full email visible when using the deployed app" : ""}
+            helperText={!email ? "Email not available in token claims" : ""}
           />
 
           <Controller
