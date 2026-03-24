@@ -97,19 +97,23 @@ const ProductPage: React.FC = () => {
         <div className={style.categoryTabs}>
           <Chip
             label="All"
-            color={selectedCategory === null ? "primary" : "default"}
             onClick={() => setSelectedCategory(null)}
             size="small"
-            sx={{ mr: 0.5 }}
+            sx={{
+              "&&": { backgroundColor: selectedCategory === null ? "#1976d2" : "#e0e0e0", color: selectedCategory === null ? "#fff" : "#333" },
+              fontWeight: selectedCategory === null ? 600 : 400,
+            }}
           />
           {categories.map((cat) => (
             <Chip
               key={cat.id}
               label={`${cat.name} (${cat.productCount})`}
-              color={selectedCategory === cat.id ? "primary" : "default"}
               onClick={() => setSelectedCategory(cat.id)}
               size="small"
-              sx={{ mr: 0.5 }}
+              sx={{
+                "&&": { backgroundColor: selectedCategory === cat.id ? "#1976d2" : "#e0e0e0", color: selectedCategory === cat.id ? "#fff" : "#333" },
+                fontWeight: selectedCategory === cat.id ? 600 : 400,
+              }}
             />
           ))}
         </div>
@@ -149,9 +153,18 @@ const ProductPage: React.FC = () => {
       </InfiniteScrollList>
 
       <Fab
-        color="primary"
         onClick={() => navigate("/products/add")}
-        sx={{ position: "fixed", bottom: 72, right: 16, maxWidth: 480 }}
+        sx={{
+          "&&": {
+            position: "fixed",
+            bottom: 72,
+            right: 16,
+            backgroundColor: "#1976d2",
+            color: "#fff",
+          },
+          zIndex: 99,
+          "&:hover": { backgroundColor: "#1565c0" },
+        }}
       >
         <AddIcon />
       </Fab>

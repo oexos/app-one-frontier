@@ -12,11 +12,21 @@ interface Inputs {
   storeName: string;
 }
 
+const extractEmail = (account: { username?: string; idTokenClaims?: Record<string, unknown> }): string => {
+  const claims = account.idTokenClaims || {};
+  if (typeof claims.email === "string") return claims.email;
+  if (Array.isArray(claims.emails) && claims.emails.length > 0) return claims.emails[0];
+  const username = account.username || "";
+  if (username.includes("@") && !username.match(/^[0-9a-f-]+@/)) return username;
+  return "";
+};
+
 const AccountSettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { accounts } = useMsal();
   const { showSnackbar } = useOutletContext<LayoutContext>();
   const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
 
   const { control, handleSubmit, formState, reset } = useForm<Inputs>({
     mode: "all",
@@ -27,10 +37,15 @@ const AccountSettingsPage: React.FC = () => {
 
   useEffect(() => {
     if (accounts.length > 0) {
-      setEmail(accounts[0].username || "");
+      setDisplayName(accounts[0].name || "");
+      const msalEmail = extractEmail(accounts[0]);
+      if (msalEmail) setEmail(msalEmail);
     }
     getMyStore().then((res) => {
       reset({ storeName: res.data.storeName });
+      if (!email && res.data.ownerEmail) {
+        setEmail(res.data.ownerEmail);
+      }
     }).catch(console.error);
   }, [accounts, reset]);
 
@@ -61,7 +76,16 @@ const AccountSettingsPage: React.FC = () => {
 
       <Card sx={{ mx: 2, mt: 1 }}>
         <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <TextField label="Email" value={email} disabled fullWidth />
+          {displayName && (
+            <TextField label="Name" value={displayName} disabled fullWidth />
+          )}
+          <TextField
+            label="Email"
+            value={email}
+            disabled
+            fullWidth
+            helperText={email.match(/^[0-9a-f-]+@/) ? "Full email visible when using the deployed app" : ""}
+          />
 
           <Controller
             name="storeName"

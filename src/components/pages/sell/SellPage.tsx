@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux-toolkit/store";
-import { addToCart, setCartOpen } from "./sellSlice";
+import { addToCart, setCartOpen, CartItem } from "./sellSlice";
 import { searchProducts, getCategories, ProductResponse, CategoryResponse } from "../product/productApiService";
 import { Card, CardContent, Typography, TextField, InputAdornment, Chip, Badge, Snackbar, Alert } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -17,9 +17,15 @@ const SellPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { showSnackbar } = useOutletContext<LayoutContext>();
+  const cartItems = useSelector((state: RootState) => state.sell.cartItems);
   const cartItemCount = useSelector((state: RootState) => state.sell.cartItemCount);
   const cartTotal = useSelector((state: RootState) => state.sell.cartTotal);
   const isCartOpen = useSelector((state: RootState) => state.sell.isCartOpen);
+
+  const getDisplayStock = (product: ProductResponse): number => {
+    const inCart = cartItems.find((c: CartItem) => c.productId === product.id);
+    return product.quantity - (inCart?.quantity || 0);
+  };
 
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -29,6 +35,7 @@ const SellPage: React.FC = () => {
   const [hasNext, setHasNext] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [totalProducts, setTotalProducts] = useState(0);
+  const [hasAnyProducts, setHasAnyProducts] = useState(false);
   const [stockWarning, setStockWarning] = useState("");
 
   const loadProducts = useCallback(async (pageNum: number, append: boolean) => {
@@ -48,6 +55,7 @@ const SellPage: React.FC = () => {
       }
       setHasNext(res.data.hasNext);
       setTotalProducts(res.data.totalElements);
+      if (res.data.totalElements > 0) setHasAnyProducts(true);
     } catch (err) {
       console.error("Failed to load products", err);
     } finally {
@@ -86,7 +94,7 @@ const SellPage: React.FC = () => {
     }));
   };
 
-  if (totalProducts === 0 && !isLoading && !search && selectedCategory === null) {
+  if (!hasAnyProducts && !isLoading && !search && selectedCategory === null) {
     return (
       <div className={style.emptyState}>
         <Typography variant="h6" gutterBottom>No products yet!</Typography>
@@ -107,77 +115,105 @@ const SellPage: React.FC = () => {
 
   return (
     <div className={style.container}>
-      <div className={style.header}>
-        <Typography variant="h6" fontWeight={600}>Sell</Typography>
-      </div>
-
-      {(totalProducts > 0 || search) && (
-        <div className={style.searchBar}>
-          <TextField
-            size="small"
-            placeholder="Search products..."
-            fullWidth
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+      <div className={style.stickyHeader}>
+        <div className={style.header}>
+          <Typography variant="h6" fontWeight={600}>Sell</Typography>
         </div>
-      )}
 
-      {categories.length > 0 && (
-        <div className={style.categoryTabs}>
+        {(hasAnyProducts || search) && (
+          <div className={style.searchBar}>
+            <TextField
+              size="small"
+              placeholder="Search products..."
+              fullWidth
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
+        )}
+
+        {categories.length > 0 && (
+          <div className={style.categoryTabs}>
           <Chip
             label="All"
-            color={selectedCategory === null ? "primary" : "default"}
             onClick={() => setSelectedCategory(null)}
-            sx={{ mr: 0.5 }}
+            size="small"
+            sx={{
+              "&&": {
+                backgroundColor: selectedCategory === null ? "#1976d2" : "#e0e0e0",
+                color: selectedCategory === null ? "#fff" : "#333",
+              },
+              fontWeight: selectedCategory === null ? 600 : 400,
+            }}
           />
           <Chip
             label="Favorites"
-            color={selectedCategory === -1 ? "primary" : "default"}
             onClick={() => setSelectedCategory(-1)}
-            sx={{ mr: 0.5 }}
+            size="small"
+            sx={{
+              "&&": {
+                backgroundColor: selectedCategory === -1 ? "#1976d2" : "#e0e0e0",
+                color: selectedCategory === -1 ? "#fff" : "#333",
+              },
+              fontWeight: selectedCategory === -1 ? 600 : 400,
+            }}
           />
           {categories.map((cat) => (
             <Chip
               key={cat.id}
               label={cat.name}
-              color={selectedCategory === cat.id ? "primary" : "default"}
               onClick={() => setSelectedCategory(cat.id)}
-              sx={{ mr: 0.5 }}
+              size="small"
+              sx={{
+                "&&": {
+                  backgroundColor: selectedCategory === cat.id ? "#1976d2" : "#e0e0e0",
+                  color: selectedCategory === cat.id ? "#fff" : "#333",
+                },
+                fontWeight: selectedCategory === cat.id ? 600 : 400,
+              }}
             />
           ))}
         </div>
       )}
+      </div>
 
       <InfiniteScrollList fetchNextPage={fetchNextPage} hasNextPage={hasNext} isLoading={isLoading}>
         <div className={style.productGrid}>
-          {products.map((product) => (
-            <Card
-              key={product.id}
-              className={`${style.productCard} ${product.quantity <= 0 ? style.outOfStock : ""}`}
-              onClick={() => handleAddToCart(product)}
-              sx={{ cursor: "pointer" }}
-            >
-              <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-                <Typography variant="body2" fontWeight={600} noWrap>
-                  {product.name}
-                </Typography>
-                <Typography variant="h6" color="primary" fontWeight={700}>
-                  P{product.sellingPrice.toFixed(2)}
-                </Typography>
-                <Typography variant="caption" color={product.isLowStock ? "error" : "text.secondary"}>
-                  Stock: {product.quantity}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
+          {products.map((product) => {
+            const displayStock = getDisplayStock(product);
+            const inCart = cartItems.find((c: CartItem) => c.productId === product.id);
+            return (
+              <Card
+                key={product.id}
+                className={`${style.productCard} ${displayStock <= 0 ? style.outOfStock : ""}`}
+                onClick={() => handleAddToCart(product)}
+                sx={{ cursor: "pointer" }}
+              >
+                <CardContent sx={{ p: 1, "&:last-child": { pb: 1 }, overflow: "hidden" }}>
+                  <Typography variant="caption" fontWeight={600} noWrap display="block" sx={{ lineHeight: 1.3 }}>
+                    {product.name}
+                  </Typography>
+                  <Typography color="primary" fontWeight={700} noWrap sx={{ fontSize: product.sellingPrice >= 1000 ? "0.85rem" : "1.05rem" }}>
+                    P{product.sellingPrice % 1 === 0 ? product.sellingPrice.toFixed(0) : product.sellingPrice.toFixed(2)}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color={displayStock <= (product.lowStockThreshold ?? 5) ? "error" : "text.secondary"}
+                    sx={{ fontSize: "0.65rem" }}
+                  >
+                    Stock: {displayStock}{inCart ? ` (${inCart.quantity} in cart)` : ""}
+                  </Typography>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </InfiniteScrollList>
 

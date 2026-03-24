@@ -23,14 +23,24 @@ const BottomNav: React.FC = () => {
   const currentIndex = navItems.findIndex((item) => location.pathname.startsWith(item.path));
 
   return (
-    <Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000 }} elevation={3}>
+    <Paper
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100%",
+        maxWidth: 480,
+        zIndex: 1000,
+      }}
+      elevation={3}
+    >
       <BottomNavigation
         value={currentIndex >= 0 ? currentIndex : 0}
         onChange={(_, newValue) => {
           navigate(navItems[newValue].path);
         }}
         showLabels
-        sx={{ maxWidth: 480, margin: "0 auto" }}
       >
         {navItems.map((item) => (
           <BottomNavigationAction key={item.path} label={item.label} icon={item.icon} />

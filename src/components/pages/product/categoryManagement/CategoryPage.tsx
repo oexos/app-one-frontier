@@ -47,9 +47,10 @@ const CategoryPage: React.FC = () => {
       setDialogOpen(false);
       setCategoryName("");
       setEditingId(null);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      showSnackbar("Failed to save category", "error");
+      const error = err as { response?: { data?: { errorDetail?: string } } };
+      showSnackbar(error.response?.data?.errorDetail || "Failed to save category", "error");
     }
   };
 

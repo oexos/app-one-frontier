@@ -98,8 +98,8 @@ const QuickPriceAdjustPage: React.FC = () => {
 
         <Divider sx={{ my: 2 }} />
 
-        <FormControl>
-          <FormLabel>Selling Price</FormLabel>
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormLabel sx={{ mb: 0.5, fontWeight: 600 }}>Selling Price</FormLabel>
           <RadioGroup value={sellingPriceAction} onChange={(e) => setSellingPriceAction(e.target.value)}>
             <FormControlLabel value="NO_CHANGE" control={<Radio size="small" />} label="No Change" />
             <FormControlLabel value="INCREASE_BY" control={<Radio size="small" />} label="Increase By" />
@@ -110,16 +110,19 @@ const QuickPriceAdjustPage: React.FC = () => {
             <TextField
               size="small"
               type="number"
-              label="Amount"
+              label="Amount (PHP)"
               value={sellingPriceAmount}
               onChange={(e) => setSellingPriceAmount(e.target.value)}
+              inputProps={{ inputMode: "decimal", min: 0, step: "any" }}
+              onKeyDown={(e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); }}
+              fullWidth
               sx={{ mt: 1 }}
             />
           )}
         </FormControl>
 
-        <FormControl sx={{ mt: 2 }}>
-          <FormLabel>Cost Price</FormLabel>
+        <FormControl fullWidth>
+          <FormLabel sx={{ mb: 0.5, fontWeight: 600 }}>Cost Price</FormLabel>
           <RadioGroup value={costPriceAction} onChange={(e) => setCostPriceAction(e.target.value)}>
             <FormControlLabel value="NO_CHANGE" control={<Radio size="small" />} label="No Change" />
             <FormControlLabel value="INCREASE_BY" control={<Radio size="small" />} label="Increase By" />
@@ -130,9 +133,12 @@ const QuickPriceAdjustPage: React.FC = () => {
             <TextField
               size="small"
               type="number"
-              label="Amount"
+              label="Amount (PHP)"
               value={costPriceAmount}
               onChange={(e) => setCostPriceAmount(e.target.value)}
+              inputProps={{ inputMode: "decimal", min: 0, step: "any" }}
+              onKeyDown={(e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); }}
+              fullWidth
               sx={{ mt: 1 }}
             />
           )}

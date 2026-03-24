@@ -84,8 +84,8 @@ const InventoryPage: React.FC = () => {
       </div>
 
       <div className={style.tabs}>
-        <Chip label="Low Stock" color={lowStockOnly ? "error" : "default"} onClick={() => setLowStockOnly(true)} />
-        <Chip label="All Products" color={!lowStockOnly ? "primary" : "default"} onClick={() => setLowStockOnly(false)} />
+        <Chip label="Low Stock" onClick={() => setLowStockOnly(true)} sx={{ "&&": { backgroundColor: lowStockOnly ? "#d32f2f" : "#e0e0e0", color: lowStockOnly ? "#fff" : "#333" }, fontWeight: lowStockOnly ? 600 : 400 }} />
+        <Chip label="All Products" onClick={() => setLowStockOnly(false)} sx={{ "&&": { backgroundColor: !lowStockOnly ? "#1976d2" : "#e0e0e0", color: !lowStockOnly ? "#fff" : "#333" }, fontWeight: !lowStockOnly ? 600 : 400 }} />
       </div>
 
       <InfiniteScrollList fetchNextPage={fetchNextPage} hasNextPage={hasNext} isLoading={isLoading}>
@@ -133,6 +133,8 @@ const InventoryPage: React.FC = () => {
             fullWidth
             value={addQty}
             onChange={(e) => setAddQty(e.target.value)}
+            inputProps={{ inputMode: "numeric", min: 1, step: 1 }}
+            onKeyDown={(e) => { if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault(); }}
             autoFocus
           />
           <TextField
@@ -141,6 +143,8 @@ const InventoryPage: React.FC = () => {
             fullWidth
             value={newCostPrice}
             onChange={(e) => setNewCostPrice(e.target.value)}
+            inputProps={{ inputMode: "decimal", min: 0, step: "any" }}
+            onKeyDown={(e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); }}
             helperText="Leave empty to keep current cost price"
           />
         </DialogContent>

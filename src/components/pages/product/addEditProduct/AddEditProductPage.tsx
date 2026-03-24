@@ -105,9 +105,10 @@ const AddEditProductPage: React.FC = () => {
       }
       dispatch(triggerProductRefresh());
       navigate("/products");
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      showSnackbar("Failed to save product", "error");
+      const error = err as { response?: { data?: { errorDetail?: string } } };
+      showSnackbar(error.response?.data?.errorDetail || "Failed to save product", "error");
     }
   };
 
@@ -173,6 +174,8 @@ const AddEditProductPage: React.FC = () => {
                 fullWidth
                 required
                 type="number"
+                inputProps={{ inputMode: "decimal", min: 0, step: "any" }}
+                onKeyDown={(e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); }}
                 sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
                 error={Boolean(formState.dirtyFields.sellingPrice && formState.errors.sellingPrice)}
                 helperText={formState.dirtyFields.sellingPrice && formState.errors.sellingPrice?.message}
@@ -194,6 +197,8 @@ const AddEditProductPage: React.FC = () => {
                 fullWidth
                 required
                 type="number"
+                inputProps={{ inputMode: "decimal", min: 0, step: "any" }}
+                onKeyDown={(e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); }}
                 sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
                 error={Boolean(formState.dirtyFields.costPrice && formState.errors.costPrice)}
                 helperText={formState.dirtyFields.costPrice && formState.errors.costPrice?.message}
@@ -221,6 +226,8 @@ const AddEditProductPage: React.FC = () => {
                 fullWidth
                 required
                 type="number"
+                inputProps={{ inputMode: "numeric", min: 0, step: 1 }}
+                onKeyDown={(e) => { if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault(); }}
                 sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
                 error={Boolean(formState.dirtyFields.quantity && formState.errors.quantity)}
                 helperText={formState.dirtyFields.quantity && formState.errors.quantity?.message}
@@ -234,7 +241,14 @@ const AddEditProductPage: React.FC = () => {
             control={control}
             rules={{ required: "Required" }}
             render={({ field }) => (
-              <TextField label="Low Stock Alert Threshold" fullWidth type="number" {...field} />
+              <TextField
+                label="Low Stock Alert Threshold"
+                fullWidth
+                type="number"
+                inputProps={{ inputMode: "numeric", min: 0, step: 1 }}
+                onKeyDown={(e) => { if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault(); }}
+                {...field}
+              />
             )}
           />
 
