@@ -26,6 +26,10 @@ const QuickPriceAdjustPage: React.FC = () => {
   const [hasNext, setHasNext] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [previews, setPreviews] = useState<PriceChangePreview[] | null>(null);
+  const [previewTotal, setPreviewTotal] = useState(0);
+  const [previewPage, setPreviewPage] = useState(0);
+  const [previewHasNext, setPreviewHasNext] = useState(false);
+  const [isPreviewFetching, setIsPreviewFetching] = useState(false);
 
   const loadProducts = useCallback(async (pageNum: number, append: boolean) => {
     setIsFetching(true);
@@ -75,18 +79,37 @@ const QuickPriceAdjustPage: React.FC = () => {
     preview,
   });
 
-  const handlePreview = async () => {
-    setIsLoading(true);
+  const loadPreviewPage = async (pageNum: number, append: boolean) => {
+    setIsPreviewFetching(true);
     try {
-      const res = await bulkPriceAdjust(buildPayload(true));
+      const res = await bulkPriceAdjust({ ...buildPayload(true), page: pageNum, size: 20 });
       const data = res.data as BulkPricePreviewResponse;
-      setPreviews(data.previews || []);
+      if (append) {
+        setPreviews((prev) => [...(prev || []), ...data.content]);
+      } else {
+        setPreviews(data.content);
+      }
+      setPreviewTotal(data.totalElements);
+      setPreviewHasNext(data.hasNext);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { errorDetail?: string } } };
       showSnackbar(error.response?.data?.errorDetail || "Failed to preview", "error");
     } finally {
-      setIsLoading(false);
+      setIsPreviewFetching(false);
     }
+  };
+
+  const handlePreview = async () => {
+    setIsLoading(true);
+    setPreviewPage(0);
+    await loadPreviewPage(0, false);
+    setIsLoading(false);
+  };
+
+  const fetchNextPreviewPage = () => {
+    const next = previewPage + 1;
+    setPreviewPage(next);
+    loadPreviewPage(next, true);
   };
 
   const handleApply = async () => {
@@ -127,33 +150,39 @@ const QuickPriceAdjustPage: React.FC = () => {
           ) : (
             <>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {previews.length} product{previews.length !== 1 ? "s" : ""} will be updated:
+                {previewTotal} product{previewTotal !== 1 ? "s" : ""} will be updated:
               </Typography>
               <div className={style.previewList}>
-                {previews.map((p) => (
-                  <div key={p.productId} className={style.previewItem}>
-                    <Typography variant="body2" fontWeight={600}>{p.productName}</Typography>
-                    <div className={style.previewPrices}>
-                      {p.currentSellingPrice !== p.newSellingPrice && (
-                        <Typography variant="caption" display="block">
-                          Sell: <span className={style.oldPrice}>P{p.currentSellingPrice.toFixed(2)}</span>
-                          {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
-                          <span className={style.newPrice}>P{p.newSellingPrice.toFixed(2)}</span>
-                        </Typography>
-                      )}
-                      {p.currentCostPrice !== p.newCostPrice && (
-                        <Typography variant="caption" display="block">
-                          Cost: <span className={style.oldPrice}>P{p.currentCostPrice.toFixed(2)}</span>
-                          {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
-                          <span className={style.newPrice}>P{p.newCostPrice.toFixed(2)}</span>
-                        </Typography>
-                      )}
-                      {p.currentSellingPrice === p.newSellingPrice && p.currentCostPrice === p.newCostPrice && (
-                        <Typography variant="caption" color="text.secondary">No changes</Typography>
-                      )}
+                <InfiniteScrollList
+                  fetchNextPage={fetchNextPreviewPage}
+                  hasNextPage={previewHasNext}
+                  isLoading={isPreviewFetching}
+                >
+                  {previews.map((p) => (
+                    <div key={p.productId} className={style.previewItem}>
+                      <Typography variant="body2" fontWeight={600}>{p.productName}</Typography>
+                      <div className={style.previewPrices}>
+                        {p.currentSellingPrice !== p.newSellingPrice && (
+                          <Typography variant="caption" display="block">
+                            Sell: <span className={style.oldPrice}>P{p.currentSellingPrice.toFixed(2)}</span>
+                            {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
+                            <span className={style.newPrice}>P{p.newSellingPrice.toFixed(2)}</span>
+                          </Typography>
+                        )}
+                        {p.currentCostPrice !== p.newCostPrice && (
+                          <Typography variant="caption" display="block">
+                            Cost: <span className={style.oldPrice}>P{p.currentCostPrice.toFixed(2)}</span>
+                            {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
+                            <span className={style.newPrice}>P{p.newCostPrice.toFixed(2)}</span>
+                          </Typography>
+                        )}
+                        {p.currentSellingPrice === p.newSellingPrice && p.currentCostPrice === p.newCostPrice && (
+                          <Typography variant="caption" color="text.secondary">No changes</Typography>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </InfiniteScrollList>
               </div>
             </>
           )}
@@ -171,7 +200,7 @@ const QuickPriceAdjustPage: React.FC = () => {
               variant="contained"
               fullWidth
               onClick={handleApply}
-              disabled={isLoading || previews.length === 0}
+              disabled={isLoading || previewTotal === 0}
               sx={{ borderRadius: 2 }}
             >
               {isLoading ? "Applying..." : "Confirm & Apply"}

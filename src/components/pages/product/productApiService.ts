@@ -111,7 +111,11 @@ export interface PriceChangePreview {
 }
 
 export interface BulkPricePreviewResponse {
-  previews: PriceChangePreview[];
+  content: PriceChangePreview[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  hasNext: boolean;
 }
 
 export const bulkPriceAdjust = async (data: {
@@ -124,6 +128,8 @@ export const bulkPriceAdjust = async (data: {
   costPriceAction: string;
   costPriceAmount: number;
   preview: boolean;
+  page?: number;
+  size?: number;
 }) => {
   return axiosInstance.patch(`${backendUrl}/app-one-backend/products/bulk-price`, data);
 };
