@@ -120,7 +120,7 @@ const CategoryPage: React.FC = () => {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>{editingId ? "Edit Category" : "Add Category"}</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ overflow: "visible", pt: "16px !important" }}>
           <TextField
             autoFocus
             fullWidth

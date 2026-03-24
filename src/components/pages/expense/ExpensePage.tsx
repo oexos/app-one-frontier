@@ -163,7 +163,7 @@ const ExpensePage: React.FC = () => {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>{editingExpense ? "Edit Expense" : "Add Expense"}</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 3 }}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "24px !important", overflow: "visible" }}>
           <TextField
             label="Description"
             fullWidth
