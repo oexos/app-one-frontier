@@ -101,6 +101,19 @@ export const deleteCategory = async (id: number) => {
   return axiosInstance.delete(`${backendUrl}/app-one-backend/categories/${id}`);
 };
 
+export interface PriceChangePreview {
+  productId: number;
+  productName: string;
+  currentSellingPrice: number;
+  newSellingPrice: number;
+  currentCostPrice: number;
+  newCostPrice: number;
+}
+
+export interface BulkPricePreviewResponse {
+  previews: PriceChangePreview[];
+}
+
 export const bulkPriceAdjust = async (data: {
   productIds: number[];
   selectAll: boolean;

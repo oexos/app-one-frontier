@@ -25,3 +25,27 @@
   border-radius: 8px !important;
   margin-bottom: 4px;
 }
+
+.previewList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.previewItem {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.previewPrices {
+  margin-top: 2px;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.newPrice {
+  color: #1976d2;
+  font-weight: 600;
+}

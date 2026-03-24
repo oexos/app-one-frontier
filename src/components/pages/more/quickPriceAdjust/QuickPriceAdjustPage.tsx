@@ -5,7 +5,8 @@ import {
   Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Divider, Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { searchProducts, bulkPriceAdjust, ProductResponse } from "../../product/productApiService";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { searchProducts, bulkPriceAdjust, ProductResponse, PriceChangePreview, BulkPricePreviewResponse } from "../../product/productApiService";
 import InfiniteScrollList from "../../../shared/InfiniteScrollList";
 import { LayoutContext } from "../../../layout/AuthenticatedLayout";
 import style from "./QuickPriceAdjustPage.module.css";
@@ -24,6 +25,7 @@ const QuickPriceAdjustPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [previews, setPreviews] = useState<PriceChangePreview[] | null>(null);
 
   const loadProducts = useCallback(async (pageNum: number, append: boolean) => {
     setIsFetching(true);
@@ -61,20 +63,36 @@ const QuickPriceAdjustPage: React.FC = () => {
     });
   };
 
+  const buildPayload = (preview: boolean) => ({
+    productIds: Array.from(selectedIds),
+    selectAll,
+    categoryId: null,
+    search: null,
+    sellingPriceAction,
+    sellingPriceAmount: sellingPriceAmount ? parseFloat(sellingPriceAmount) : 0,
+    costPriceAction,
+    costPriceAmount: costPriceAmount ? parseFloat(costPriceAmount) : 0,
+    preview,
+  });
+
+  const handlePreview = async () => {
+    setIsLoading(true);
+    try {
+      const res = await bulkPriceAdjust(buildPayload(true));
+      const data = res.data as BulkPricePreviewResponse;
+      setPreviews(data.previews || []);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { errorDetail?: string } } };
+      showSnackbar(error.response?.data?.errorDetail || "Failed to preview", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleApply = async () => {
     setIsLoading(true);
     try {
-      await bulkPriceAdjust({
-        productIds: Array.from(selectedIds),
-        selectAll,
-        categoryId: null,
-        search: null,
-        sellingPriceAction,
-        sellingPriceAmount: sellingPriceAmount ? parseFloat(sellingPriceAmount) : 0,
-        costPriceAction,
-        costPriceAmount: costPriceAmount ? parseFloat(costPriceAmount) : 0,
-        preview: false,
-      });
+      await bulkPriceAdjust(buildPayload(false));
       showSnackbar("Prices updated");
       navigate("/products");
     } catch (err: unknown) {
@@ -87,6 +105,82 @@ const QuickPriceAdjustPage: React.FC = () => {
 
   const hasSelection = selectAll || selectedIds.size > 0;
   const hasAction = sellingPriceAction !== "NO_CHANGE" || costPriceAction !== "NO_CHANGE";
+
+  // Preview mode
+  if (previews !== null) {
+    return (
+      <div className={style.container}>
+        <div className={style.header}>
+          <Tooltip title="Back to adjustment options" arrow>
+            <IconButton onClick={() => setPreviews(null)}>
+              <ArrowBackIcon />
+            </IconButton>
+          </Tooltip>
+          <Typography variant="h6" fontWeight={600}>Preview Changes</Typography>
+        </div>
+
+        <div className={style.content}>
+          {previews.length === 0 ? (
+            <Typography color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
+              No price changes to preview.
+            </Typography>
+          ) : (
+            <>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {previews.length} product{previews.length !== 1 ? "s" : ""} will be updated:
+              </Typography>
+              <div className={style.previewList}>
+                {previews.map((p) => (
+                  <div key={p.productId} className={style.previewItem}>
+                    <Typography variant="body2" fontWeight={600}>{p.productName}</Typography>
+                    <div className={style.previewPrices}>
+                      {p.currentSellingPrice !== p.newSellingPrice && (
+                        <Typography variant="caption" display="block">
+                          Sell: <span className={style.oldPrice}>P{p.currentSellingPrice.toFixed(2)}</span>
+                          {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
+                          <span className={style.newPrice}>P{p.newSellingPrice.toFixed(2)}</span>
+                        </Typography>
+                      )}
+                      {p.currentCostPrice !== p.newCostPrice && (
+                        <Typography variant="caption" display="block">
+                          Cost: <span className={style.oldPrice}>P{p.currentCostPrice.toFixed(2)}</span>
+                          {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
+                          <span className={style.newPrice}>P{p.newCostPrice.toFixed(2)}</span>
+                        </Typography>
+                      )}
+                      {p.currentSellingPrice === p.newSellingPrice && p.currentCostPrice === p.newCostPrice && (
+                        <Typography variant="caption" color="text.secondary">No changes</Typography>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => setPreviews(null)}
+              sx={{ borderRadius: 2 }}
+            >
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleApply}
+              disabled={isLoading || previews.length === 0}
+              sx={{ borderRadius: 2 }}
+            >
+              {isLoading ? "Applying..." : "Confirm & Apply"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={style.container}>
@@ -175,17 +269,17 @@ const QuickPriceAdjustPage: React.FC = () => {
           )}
         </FormControl>
 
-        <Tooltip title="Apply the selected price changes" arrow>
+        <Tooltip title="Preview the price changes before applying" arrow>
           <span>
             <Button
               variant="contained"
               fullWidth
               size="large"
               sx={{ mt: 3, py: 1.2, borderRadius: 2 }}
-              onClick={handleApply}
+              onClick={handlePreview}
               disabled={!hasSelection || !hasAction || isLoading}
             >
-              {isLoading ? "Applying..." : "Apply Price Changes"}
+              {isLoading ? "Loading Preview..." : "Preview Changes"}
             </Button>
           </span>
         </Tooltip>
