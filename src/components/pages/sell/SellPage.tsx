@@ -34,7 +34,6 @@ const SellPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [totalProducts, setTotalProducts] = useState(0);
   const [hasAnyProducts, setHasAnyProducts] = useState(false);
   const [stockWarning, setStockWarning] = useState("");
 
@@ -54,7 +53,6 @@ const SellPage: React.FC = () => {
         setProducts(res.data.content);
       }
       setHasNext(res.data.hasNext);
-      setTotalProducts(res.data.totalElements);
       if (res.data.totalElements > 0) setHasAnyProducts(true);
     } catch (err) {
       console.error("Failed to load products", err);
