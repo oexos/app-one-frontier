@@ -124,7 +124,7 @@ const DailySummaryPage: React.FC = () => {
                   <Typography variant="body1" fontWeight={600} gutterBottom>Top Sellers</Typography>
                 </Tooltip>
                 {summary.topSellers.map((ts, i) => (
-                  <div key={i} className={style.topSeller}>
+                  <div key={ts.productName} className={style.topSeller}>
                     <Typography variant="body2">{i + 1}. {ts.productName}</Typography>
                     <Typography variant="body2" fontWeight={600}>{ts.quantitySold} sold</Typography>
                   </div>

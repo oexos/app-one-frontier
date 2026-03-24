@@ -38,13 +38,16 @@ const AccountSettingsPage: React.FC = () => {
   useEffect(() => {
     if (accounts.length > 0) {
       setDisplayName(accounts[0].name || "");
-      const msalEmail = extractEmail(accounts[0]);
-      if (msalEmail) setEmail(msalEmail);
     }
     getMyStore().then((res) => {
       reset({ storeName: res.data.storeName });
-      if (!email && res.data.ownerEmail) {
+      // Set ownerEmail first as fallback, then override with MSAL email if available
+      if (res.data.ownerEmail) {
         setEmail(res.data.ownerEmail);
+      }
+      if (accounts.length > 0) {
+        const msalEmail = extractEmail(accounts[0]);
+        if (msalEmail) setEmail(msalEmail);
       }
     }).catch(console.error);
   }, [accounts, reset]);

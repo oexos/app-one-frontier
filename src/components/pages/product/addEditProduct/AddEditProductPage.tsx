@@ -33,6 +33,7 @@ const AddEditProductPage: React.FC = () => {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [priceWarning, setPriceWarning] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const { control, handleSubmit, formState, reset, watch, trigger } = useForm<Inputs>({
     mode: "all",
@@ -68,7 +69,7 @@ const AddEditProductPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isEdit && id) {
+    if (isEdit && id && !isDeleted) {
       getProduct(Number(id)).then((res) => {
         const p = res.data;
         reset({
@@ -81,11 +82,13 @@ const AddEditProductPage: React.FC = () => {
           isFavorite: p.isFavorite,
         });
       }).catch(() => {
-        showSnackbar("Product not found", "error");
-        navigate("/products");
+        if (!isDeleted) {
+          showSnackbar("Product not found", "error");
+          navigate("/products");
+        }
       });
     }
-  }, [isEdit, id, reset, showSnackbar, navigate]);
+  }, [isEdit, id, isDeleted, reset, showSnackbar, navigate]);
 
   const oneOfTheFieldsHasErrors = Object.keys(formState.errors).length > 0;
   const oneOfTheFieldIsValidating = Object.keys(formState.validatingFields).length > 0;
@@ -123,6 +126,7 @@ const AddEditProductPage: React.FC = () => {
   const handleDelete = async () => {
     try {
       await deleteProduct(Number(id));
+      setIsDeleted(true);
       dispatch(triggerProductRefresh());
       showSnackbar("Product deleted");
       navigate("/products");
