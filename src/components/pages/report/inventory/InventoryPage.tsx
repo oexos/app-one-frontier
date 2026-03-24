@@ -139,11 +139,13 @@ const InventoryPage: React.FC = () => {
             label="Quantity to Add"
             type="number"
             fullWidth
+            required
             value={addQty}
             onChange={(e) => setAddQty(e.target.value)}
             inputProps={{ inputMode: "numeric", min: 1, step: 1 }}
             onKeyDown={(e) => { if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault(); }}
             autoFocus
+            sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
           />
           <TextField
             label="New Cost Price (optional)"

@@ -125,9 +125,10 @@ const CategoryPage: React.FC = () => {
             autoFocus
             fullWidth
             label="Category Name"
+            required
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, "& .MuiFormLabel-asterisk": { color: "red" } }}
           />
         </DialogContent>
         <DialogActions>

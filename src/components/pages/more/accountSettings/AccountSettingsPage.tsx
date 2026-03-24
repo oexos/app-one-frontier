@@ -28,7 +28,7 @@ const AccountSettingsPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
 
-  const { control, handleSubmit, formState, reset } = useForm<Inputs>({
+  const { control, handleSubmit, formState, reset, trigger } = useForm<Inputs>({
     mode: "all",
     reValidateMode: "onChange",
     criteriaMode: "all",
@@ -49,7 +49,13 @@ const AccountSettingsPage: React.FC = () => {
     }).catch(console.error);
   }, [accounts, reset]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => { trigger(); }, 100);
+    return () => clearTimeout(timeout);
+  }, [trigger]);
+
   const oneOfTheFieldsHasErrors = Object.keys(formState.errors).length > 0;
+  const oneOfTheFieldIsValidating = Object.keys(formState.validatingFields).length > 0;
   const oneOfTheFieldsIsDirty = Object.keys(formState.dirtyFields).length > 0;
 
   const onSubmit = async (data: Inputs) => {
@@ -110,7 +116,7 @@ const AccountSettingsPage: React.FC = () => {
             variant="contained"
             fullWidth
             onClick={() => handleSubmit(onSubmit, onError)()}
-            disabled={oneOfTheFieldsHasErrors || !oneOfTheFieldsIsDirty || formState.isSubmitting}
+            disabled={oneOfTheFieldsHasErrors || oneOfTheFieldIsValidating || !oneOfTheFieldsIsDirty || formState.isSubmitting || formState.isLoading}
           >
             {formState.isSubmitting ? "Saving..." : "Save Changes"}
           </Button>

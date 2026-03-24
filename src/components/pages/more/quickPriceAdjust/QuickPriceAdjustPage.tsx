@@ -85,7 +85,7 @@ const QuickPriceAdjustPage: React.FC = () => {
         {!selectAll && (
           <div className={style.productList}>
             {products.map((p) => (
-              <Card key={p.id} className={style.productCard} onClick={() => toggleSelect(p.id)}>
+              <Card key={p.id} onClick={() => toggleSelect(p.id)} sx={{ "&&": { overflow: "visible" }, cursor: "pointer", borderRadius: 2, mb: 0.5 }}>
                 <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 }, display: "flex", alignItems: "center", gap: 1 }}>
                   <Checkbox checked={selectedIds.has(p.id)} size="small" />
                   <div style={{ flex: 1 }}>

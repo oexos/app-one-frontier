@@ -17,12 +17,15 @@
 .productList {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-height: 250px;
+  gap: 6px;
+  max-height: 300px;
   overflow-y: auto;
+  padding: 4px 0;
 }
 
 .productCard {
   cursor: pointer;
   border-radius: 8px !important;
+  background-color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }

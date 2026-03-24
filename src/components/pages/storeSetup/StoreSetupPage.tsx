@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, Card, CardContent, Typography } from "@mui/material";
@@ -13,14 +13,20 @@ const StoreSetupPage: React.FC = () => {
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState("");
 
-  const { control, handleSubmit, formState } = useForm<Inputs>({
+  const { control, handleSubmit, formState, trigger } = useForm<Inputs>({
     mode: "all",
     reValidateMode: "onChange",
     criteriaMode: "all",
     defaultValues: { storeName: "" },
   });
 
+  useEffect(() => {
+    const timeout = setTimeout(() => { trigger(); }, 100);
+    return () => clearTimeout(timeout);
+  }, [trigger]);
+
   const oneOfTheFieldsHasErrors = Object.keys(formState.errors).length > 0;
+  const oneOfTheFieldIsValidating = Object.keys(formState.validatingFields).length > 0;
   const oneOfTheFieldsIsDirty = Object.keys(formState.dirtyFields).length > 0;
 
   const onSubmit = async (data: Inputs) => {
@@ -95,7 +101,7 @@ const StoreSetupPage: React.FC = () => {
             size="large"
             sx={{ mt: 3, py: 1.2, borderRadius: 2 }}
             onClick={() => handleSubmit(onSubmit, onError)()}
-            disabled={oneOfTheFieldsHasErrors || !oneOfTheFieldsIsDirty || formState.isSubmitting}
+            disabled={oneOfTheFieldsHasErrors || oneOfTheFieldIsValidating || !oneOfTheFieldsIsDirty || formState.isSubmitting || formState.isLoading}
           >
             {formState.isSubmitting ? "Creating..." : "Start Selling"}
           </Button>

@@ -34,7 +34,7 @@ const AddEditProductPage: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [priceWarning, setPriceWarning] = useState(false);
 
-  const { control, handleSubmit, formState, reset, watch } = useForm<Inputs>({
+  const { control, handleSubmit, formState, reset, watch, trigger } = useForm<Inputs>({
     mode: "all",
     reValidateMode: "onChange",
     criteriaMode: "all",
@@ -57,6 +57,11 @@ const AddEditProductPage: React.FC = () => {
     const cp = parseFloat(costPrice);
     setPriceWarning(!isNaN(sp) && !isNaN(cp) && cp >= sp && sp > 0);
   }, [sellingPrice, costPrice]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => { trigger(); }, 100);
+    return () => clearTimeout(timeout);
+  }, [trigger]);
 
   useEffect(() => {
     getCategories().then((res) => setCategories(res.data)).catch(console.error);
@@ -83,6 +88,7 @@ const AddEditProductPage: React.FC = () => {
   }, [isEdit, id, reset, showSnackbar, navigate]);
 
   const oneOfTheFieldsHasErrors = Object.keys(formState.errors).length > 0;
+  const oneOfTheFieldIsValidating = Object.keys(formState.validatingFields).length > 0;
   const oneOfTheFieldsIsDirty = Object.keys(formState.dirtyFields).length > 0;
 
   const onSubmit = async (data: Inputs) => {
@@ -292,7 +298,7 @@ const AddEditProductPage: React.FC = () => {
             fullWidth
             sx={{ mt: 1, py: 1.2, borderRadius: 2 }}
             onClick={() => handleSubmit(onSubmit, onError)()}
-            disabled={oneOfTheFieldsHasErrors || !oneOfTheFieldsIsDirty || formState.isSubmitting}
+            disabled={oneOfTheFieldsHasErrors || oneOfTheFieldIsValidating || !oneOfTheFieldsIsDirty || formState.isSubmitting || formState.isLoading}
           >
             {formState.isSubmitting ? "Saving..." : isEdit ? "Update Product" : "Add Product"}
           </Button>

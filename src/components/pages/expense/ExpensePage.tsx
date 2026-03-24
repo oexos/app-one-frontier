@@ -167,27 +167,33 @@ const ExpensePage: React.FC = () => {
           <TextField
             label="Description"
             fullWidth
+            required
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g., Electricity, Transportation"
             autoFocus
+            sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
           />
           <TextField
             label="Amount"
             type="number"
             fullWidth
+            required
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             inputProps={{ inputMode: "decimal", min: 0, step: "any" }}
             onKeyDown={(e) => { if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault(); }}
+            sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
           />
           <TextField
             label="Date"
             type="date"
             fullWidth
+            required
             value={expenseDate}
             onChange={(e) => setExpenseDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
+            sx={{ "& .MuiFormLabel-asterisk": { color: "red" } }}
           />
         </DialogContent>
         <DialogActions>
