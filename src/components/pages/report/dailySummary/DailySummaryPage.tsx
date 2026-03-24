@@ -120,13 +120,29 @@ const DailySummaryPage: React.FC = () => {
           {summary.topSellers.length > 0 && (
             <Card>
               <CardContent>
-                <Tooltip title="Products ranked by quantity sold today" arrow>
-                  <Typography variant="body1" fontWeight={600} gutterBottom>Top Sellers</Typography>
+                <Tooltip title="Products ranked by quantity sold" arrow>
+                  <Typography variant="body1" fontWeight={600} gutterBottom>Top by Quantity</Typography>
                 </Tooltip>
                 {summary.topSellers.map((ts, i) => (
                   <div key={ts.productName} className={style.topSeller}>
                     <Typography variant="body2">{i + 1}. {ts.productName}</Typography>
                     <Typography variant="body2" fontWeight={600}>{ts.quantitySold} sold</Typography>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {summary.topByRevenue && summary.topByRevenue.length > 0 && (
+            <Card>
+              <CardContent>
+                <Tooltip title="Products ranked by total sales revenue" arrow>
+                  <Typography variant="body1" fontWeight={600} gutterBottom>Top by Revenue</Typography>
+                </Tooltip>
+                {summary.topByRevenue.map((ts, i) => (
+                  <div key={ts.productName} className={style.topSeller}>
+                    <Typography variant="body2">{i + 1}. {ts.productName}</Typography>
+                    <Typography variant="body2" fontWeight={600}>P{ts.totalRevenue?.toFixed(2)}</Typography>
                   </div>
                 ))}
               </CardContent>

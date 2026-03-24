@@ -5,6 +5,7 @@ const backendUrl = import.meta.env.VITE_APP_ONE_MICROSERVICE_URL;
 export interface TopSeller {
   productName: string;
   quantitySold: number;
+  totalRevenue: number | null;
 }
 
 export interface DailySummary {
@@ -16,6 +17,7 @@ export interface DailySummary {
   transactionCount: number;
   itemsSold: number;
   topSellers: TopSeller[];
+  topByRevenue: TopSeller[];
 }
 
 export const getDailySummary = async (date?: string) => {
