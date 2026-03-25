@@ -12,8 +12,8 @@ interface StoreData {
   ownerEmail: string;
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 2000;
+const MAX_RETRIES = 5;
+const RETRY_DELAYS_MS = [1000, 2000, 3000, 4000, 5000];
 
 const AuthenticatedLayout: React.FC = () => {
   const { accounts, inProgress } = useMsal();
@@ -43,9 +43,10 @@ const AuthenticatedLayout: React.FC = () => {
         if (err.response?.status === 404) {
           navigate("/store-setup");
         } else if (retryCountRef.current < MAX_RETRIES) {
+          const delay = RETRY_DELAYS_MS[retryCountRef.current];
           retryCountRef.current += 1;
-          console.log(`Store load failed, retrying (${retryCountRef.current}/${MAX_RETRIES})...`);
-          setTimeout(() => loadStore(true), RETRY_DELAY_MS);
+          console.log(`Store load failed, retrying (${retryCountRef.current}/${MAX_RETRIES}) in ${delay}ms...`);
+          setTimeout(() => loadStore(true), delay);
         } else {
           console.error("Failed to load store after retries", err);
           setStoreError(true);
