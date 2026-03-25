@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Card, CardContent, Typography, CardActionArea, Tooltip } from "@mui/material";
+import { Card, CardContent, Typography, CardActionArea, Tooltip, Skeleton } from "@mui/material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import InventoryIcon from "@mui/icons-material/Inventory2";
 import HistoryIcon from "@mui/icons-material/History";
@@ -45,10 +45,12 @@ const ReportHubPage: React.FC = () => {
               <AssessmentIcon color="primary" fontSize="large" />
               <div>
                 <Typography variant="body1" fontWeight={600}>Daily Sales Summary</Typography>
-                {todayRevenue !== null && (
+                {todayRevenue !== null ? (
                   <Typography variant="body2" color="text.secondary">
                     Today: P{todayRevenue.toFixed(2)} revenue, P{todayProfit?.toFixed(2)} profit
                   </Typography>
+                ) : (
+                  <Skeleton variant="text" width={200} />
                 )}
               </div>
             </CardContent>
@@ -61,12 +63,14 @@ const ReportHubPage: React.FC = () => {
               <InventoryIcon color="warning" fontSize="large" />
               <div>
                 <Typography variant="body1" fontWeight={600}>Inventory / Low Stock</Typography>
-                {lowStockCount !== null && (
+                {lowStockCount !== null ? (
                   <Tooltip title="Products at or below their stock alert threshold" arrow>
                     <Typography variant="body2" color={lowStockCount > 0 ? "error" : "text.secondary"}>
                       {lowStockCount > 0 ? `${lowStockCount} products low on stock` : "All stock levels OK"}
                     </Typography>
                   </Tooltip>
+                ) : (
+                  <Skeleton variant="text" width={180} />
                 )}
               </div>
             </CardContent>
@@ -79,12 +83,14 @@ const ReportHubPage: React.FC = () => {
               <HistoryIcon color="info" fontSize="large" />
               <div>
                 <Typography variant="body1" fontWeight={600}>Sales History</Typography>
-                {todaySaleCount !== null && (
+                {todaySaleCount !== null ? (
                   <Tooltip title="Number of sales transactions today" arrow>
                     <Typography variant="body2" color="text.secondary">
                       {todaySaleCount} sales today
                     </Typography>
                   </Tooltip>
+                ) : (
+                  <Skeleton variant="text" width={120} />
                 )}
               </div>
             </CardContent>

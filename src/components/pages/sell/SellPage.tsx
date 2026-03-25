@@ -33,7 +33,7 @@ const SellPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasAnyProducts, setHasAnyProducts] = useState(false);
   const [stockWarning, setStockWarning] = useState("");
 
