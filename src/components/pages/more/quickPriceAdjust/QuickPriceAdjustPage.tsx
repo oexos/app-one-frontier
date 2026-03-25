@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import {
   Typography, Card, CardContent, IconButton, Checkbox, Button, TextField,
-  Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Divider, Tooltip,
+  Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Divider, Tooltip, Chip, InputAdornment,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { searchProducts, bulkPriceAdjust, ProductResponse, PriceChangePreview, BulkPricePreviewResponse } from "../../product/productApiService";
+import SearchIcon from "@mui/icons-material/Search";
+import { searchProducts, bulkPriceAdjust, getCategories, ProductResponse, CategoryResponse, PriceChangePreview, BulkPricePreviewResponse } from "../../product/productApiService";
 import InfiniteScrollList from "../../../shared/InfiniteScrollList";
 import { LayoutContext } from "../../../layout/AuthenticatedLayout";
 import style from "./QuickPriceAdjustPage.module.css";
@@ -30,11 +31,19 @@ const QuickPriceAdjustPage: React.FC = () => {
   const [previewPage, setPreviewPage] = useState(0);
   const [previewHasNext, setPreviewHasNext] = useState(false);
   const [isPreviewFetching, setIsPreviewFetching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
-  const loadProducts = useCallback(async (pageNum: number, append: boolean) => {
+  const loadProducts = useCallback(async (pageNum: number, append: boolean, search?: string, categoryId?: number | null) => {
     setIsFetching(true);
     try {
-      const res = await searchProducts({ page: pageNum, size: 20 });
+      const res = await searchProducts({
+        page: pageNum,
+        size: 20,
+        search: search || undefined,
+        categoryId: categoryId ?? undefined,
+      });
       if (append) {
         setProducts((prev) => [...prev, ...res.data.content]);
       } else {
@@ -50,12 +59,18 @@ const QuickPriceAdjustPage: React.FC = () => {
 
   useEffect(() => {
     loadProducts(0, false);
+    getCategories().then((res) => setCategories(res.data)).catch(console.error);
   }, [loadProducts]);
+
+  useEffect(() => {
+    setPage(0);
+    loadProducts(0, false, searchTerm, selectedCategoryId);
+  }, [searchTerm, selectedCategoryId, loadProducts]);
 
   const fetchNextPage = () => {
     const next = page + 1;
     setPage(next);
-    loadProducts(next, true);
+    loadProducts(next, true, searchTerm, selectedCategoryId);
   };
 
   const toggleSelect = (id: number) => {
@@ -70,8 +85,8 @@ const QuickPriceAdjustPage: React.FC = () => {
   const buildPayload = (preview: boolean) => ({
     productIds: Array.from(selectedIds),
     selectAll,
-    categoryId: null,
-    search: null,
+    categoryId: selectAll ? selectedCategoryId : null,
+    search: selectAll ? (searchTerm || null) : null,
     sellingPriceAction,
     sellingPriceAmount: sellingPriceAmount ? parseFloat(sellingPriceAmount) : 0,
     costPriceAction,
@@ -229,6 +244,45 @@ const QuickPriceAdjustPage: React.FC = () => {
             label="Select All Products"
           />
         </Tooltip>
+
+        {!selectAll && (
+          <>
+            <TextField
+              size="small"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              fullWidth
+              sx={{ mb: 1 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            {categories.length > 0 && (
+              <div className={style.categoryChips}>
+                <Chip
+                  label="All"
+                  size="small"
+                  color={selectedCategoryId === null ? "primary" : "default"}
+                  onClick={() => setSelectedCategoryId(null)}
+                />
+                {categories.map((cat) => (
+                  <Chip
+                    key={cat.id}
+                    label={cat.name}
+                    size="small"
+                    color={selectedCategoryId === cat.id ? "primary" : "default"}
+                    onClick={() => setSelectedCategoryId(selectedCategoryId === cat.id ? null : cat.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
         {!selectAll && (
           <div className={style.productList}>

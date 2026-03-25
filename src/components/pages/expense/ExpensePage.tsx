@@ -122,31 +122,48 @@ const ExpensePage: React.FC = () => {
 
       <InfiniteScrollList fetchNextPage={fetchNextPage} hasNextPage={hasNext} isLoading={isLoading}>
         <div className={style.list}>
-          {expenses.map((expense) => (
-            <Card key={expense.id}>
-              <CardContent sx={{ p: 2, "&:last-child": { pb: 2 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <Typography variant="body1" fontWeight={500}>{expense.description}</Typography>
-                  <Typography variant="body2" color="error" fontWeight={600}>-P{expense.amount.toFixed(2)}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {dayjs(expense.expenseDate).format("MMM D, YYYY")}
-                  </Typography>
-                </div>
-                <div>
-                  <Tooltip title="Edit this expense" arrow>
-                    <IconButton size="small" onClick={() => openEditDialog(expense)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete this expense" arrow>
-                    <IconButton size="small" color="error" onClick={() => setDeleteConfirm(expense.id)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {expenses.map((expense, index) => {
+            const currentDate = expense.expenseDate;
+            const prevDate = index > 0 ? expenses[index - 1].expenseDate : null;
+            const showHeader = currentDate !== prevDate;
+            const today = dayjs().format("YYYY-MM-DD");
+            const yesterday = dayjs().subtract(1, "day").format("YYYY-MM-DD");
+            const dayLabel = currentDate === today ? "Today" : currentDate === yesterday ? "Yesterday" : dayjs(currentDate).format("MMM D, YYYY");
+            const dayTotal = showHeader
+              ? expenses.filter((e) => e.expenseDate === currentDate).reduce((sum, e) => sum + e.amount, 0)
+              : 0;
+
+            return (
+              <div key={expense.id}>
+                {showHeader && (
+                  <div className={style.dayHeader}>
+                    <Typography variant="body2" fontWeight={600} color="text.secondary">{dayLabel}</Typography>
+                    <Typography variant="body2" fontWeight={600} color="error">-P{dayTotal.toFixed(2)}</Typography>
+                  </div>
+                )}
+                <Card>
+                  <CardContent sx={{ p: 2, "&:last-child": { pb: 2 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <Typography variant="body1" fontWeight={500}>{expense.description}</Typography>
+                      <Typography variant="body2" color="error" fontWeight={600}>-P{expense.amount.toFixed(2)}</Typography>
+                    </div>
+                    <div>
+                      <Tooltip title="Edit this expense" arrow>
+                        <IconButton size="small" onClick={() => openEditDialog(expense)}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete this expense" arrow>
+                        <IconButton size="small" color="error" onClick={() => setDeleteConfirm(expense.id)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
           {expenses.length === 0 && !isLoading && (
             <Typography color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
               No expenses recorded yet

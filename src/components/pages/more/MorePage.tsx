@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useMsal } from "@azure/msal-react";
-import { Card, CardContent, Typography, CardActionArea, Button, Tooltip } from "@mui/material";
+import {
+  Card, CardContent, Typography, CardActionArea, Button, Tooltip,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+} from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -9,6 +13,7 @@ import style from "./MorePage.module.css";
 const MorePage: React.FC = () => {
   const navigate = useNavigate();
   const { instance } = useMsal();
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -51,13 +56,24 @@ const MorePage: React.FC = () => {
             variant="outlined"
             color="error"
             startIcon={<LogoutIcon />}
-            onClick={handleLogout}
+            onClick={() => setLogoutConfirm(true)}
             sx={{ mt: 2, mx: 2 }}
           >
             Logout
           </Button>
         </Tooltip>
       </div>
+
+      <Dialog open={logoutConfirm} onClose={() => setLogoutConfirm(false)}>
+        <DialogTitle>Logout?</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to logout?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLogoutConfirm(false)}>Cancel</Button>
+          <Button color="error" onClick={handleLogout}>Logout</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
