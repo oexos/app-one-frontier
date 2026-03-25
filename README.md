@@ -4,9 +4,19 @@ The simplest POS for every sari-sari store. A mobile-first web application that 
 
 Built for the **SEP Build Hackathon** (March 24-26, 2026).
 
+## Repositories
+
+- **Frontend:** https://bitbucket.org/legalmatch/tindahanposfrontend/src/main/
+- **Backend:** https://bitbucket.org/legalmatch/tindahanposbackend/src/main/
+
 ## Team
 
 - **Arnel Yutiga**
+
+## Documentation
+
+- **[SystemDesign.md](./SystemDesign.md)** — UI flows, screen layouts, navigation, and business logic for every screen
+- **[TechnicalRequirement.md](./TechnicalRequirement.md)** — Database entities, API endpoints, DTOs, frontend/backend structure, implementation sequence, and Azure configuration
 
 ## Tech Stack
 
@@ -69,8 +79,8 @@ You also need the **backend service** running before using the app. See the [bac
 ### 1. Clone the repository
 
 ```bash
-git clone <your-bitbucket-repo-url>
-cd app-one-frontier
+git clone https://bitbucket.org/legalmatch/tindahanposfrontend.git
+cd tindahanposfrontend
 ```
 
 ### 2. Install dependencies
