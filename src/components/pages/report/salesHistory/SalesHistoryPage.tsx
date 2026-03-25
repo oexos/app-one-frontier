@@ -131,14 +131,14 @@ const SalesHistoryPage: React.FC = () => {
                   </Tooltip>
                 </div>
                 <Typography variant="body2" color="text.secondary">
-                  {dayjs(sale.createdAt).format("h:mm A")} | {sale.totalItems} items
+                  {dayjs(sale.createdAt).format("h:mm A")} | {sale.totalItems} {sale.totalItems === 1 ? "item" : "items"}
                 </Typography>
                 <Typography variant="h6" fontWeight={700} color="primary">
-                  P{sale.totalAmount.toFixed(2)}
+                  ₱{sale.totalAmount.toFixed(2)}
                 </Typography>
                 {sale.items && sale.items.map((item) => (
                   <Typography key={item.id} variant="caption" display="block" color="text.secondary">
-                    {item.productName} x{item.quantity} = P{item.subtotal.toFixed(2)}
+                    {item.productName} x{item.quantity} = ₱{item.subtotal.toFixed(2)}
                   </Typography>
                 ))}
                 {sale.status === "COMPLETED" && isToday && (
@@ -168,6 +168,11 @@ const SalesHistoryPage: React.FC = () => {
         <DialogTitle>Void Sale #{voidConfirm?.saleNumber}?</DialogTitle>
         <DialogContent>
           <Typography>This will restore inventory and mark the sale as voided. This cannot be undone.</Typography>
+          {voidConfirm?.items && voidConfirm.items.length > 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Inventory will be restored for: {voidConfirm.items.map((item) => `${item.productName} x${item.quantity}`).join(", ")}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setVoidConfirm(null)}>Cancel</Button>

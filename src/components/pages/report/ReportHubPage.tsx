@@ -47,7 +47,7 @@ const ReportHubPage: React.FC = () => {
                 <Typography variant="body1" fontWeight={600}>Daily Sales Summary</Typography>
                 {todayRevenue !== null ? (
                   <Typography variant="body2" color="text.secondary">
-                    Today: P{todayRevenue.toFixed(2)} revenue, P{todayProfit?.toFixed(2)} profit
+                    Today: ₱{todayRevenue.toFixed(2)} revenue, ₱{todayProfit?.toFixed(2)} profit
                   </Typography>
                 ) : (
                   <Skeleton variant="text" width={200} />

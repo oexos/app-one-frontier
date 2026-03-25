@@ -107,7 +107,7 @@ const InventoryPage: React.FC = () => {
                     </Typography>
                   </Tooltip>
                   <Typography variant="caption" color="text.secondary">
-                    Cost: P{product.costPrice.toFixed(2)} | Sell: P{product.sellingPrice.toFixed(2)}
+                    Cost: ₱{product.costPrice.toFixed(2)} | Sell: ₱{product.sellingPrice.toFixed(2)}
                   </Typography>
                 </div>
                 <Button

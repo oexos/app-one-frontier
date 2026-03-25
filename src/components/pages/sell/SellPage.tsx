@@ -206,7 +206,7 @@ const SellPage: React.FC = () => {
                     {product.name}
                   </Typography>
                   <Typography color="primary" fontWeight={700} noWrap sx={{ fontSize: product.sellingPrice >= 1000 ? "0.85rem" : "1.05rem" }}>
-                    P{product.sellingPrice % 1 === 0 ? product.sellingPrice.toFixed(0) : product.sellingPrice.toFixed(2)}
+                    ₱{product.sellingPrice % 1 === 0 ? product.sellingPrice.toFixed(0) : product.sellingPrice.toFixed(2)}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -231,7 +231,7 @@ const SellPage: React.FC = () => {
               </Typography>
             </Badge>
             <Typography variant="body1" fontWeight={700} color="white">
-              P{cartTotal.toFixed(2)}
+              ₱{cartTotal.toFixed(2)}
             </Typography>
           </div>
         </Tooltip>

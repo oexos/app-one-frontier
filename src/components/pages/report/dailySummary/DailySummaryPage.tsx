@@ -67,7 +67,7 @@ const DailySummaryPage: React.FC = () => {
               <Tooltip title="Total amount from completed sales (excludes voided)" arrow>
                 <Typography variant="body2" color="text.secondary">Revenue</Typography>
               </Tooltip>
-              <Typography variant="h5" fontWeight={700} color="primary">P{summary.revenue.toFixed(2)}</Typography>
+              <Typography variant="h5" fontWeight={700} color="primary">₱{summary.revenue.toFixed(2)}</Typography>
             </CardContent>
           </Card>
           <div className={style.row}>
@@ -76,7 +76,7 @@ const DailySummaryPage: React.FC = () => {
                 <Tooltip title="Revenue minus cost of goods sold" arrow>
                   <Typography variant="caption" color="text.secondary">Product Profit</Typography>
                 </Tooltip>
-                <Typography variant="h6" fontWeight={600}>P{summary.productProfit.toFixed(2)}</Typography>
+                <Typography variant="h6" fontWeight={600}>₱{summary.productProfit.toFixed(2)}</Typography>
               </CardContent>
             </Card>
             <Card sx={{ flex: 1 }}>
@@ -84,7 +84,7 @@ const DailySummaryPage: React.FC = () => {
                 <Tooltip title="Total expenses logged for this date" arrow>
                   <Typography variant="caption" color="text.secondary">Expenses</Typography>
                 </Tooltip>
-                <Typography variant="h6" fontWeight={600} color="error">-P{summary.totalExpenses.toFixed(2)}</Typography>
+                <Typography variant="h6" fontWeight={600} color="error">-₱{summary.totalExpenses.toFixed(2)}</Typography>
               </CardContent>
             </Card>
           </div>
@@ -94,7 +94,7 @@ const DailySummaryPage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary">Actual Profit</Typography>
               </Tooltip>
               <Typography variant="h5" fontWeight={700} color={summary.actualProfit >= 0 ? "success.main" : "error"}>
-                P{summary.actualProfit.toFixed(2)}
+                ₱{summary.actualProfit.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
@@ -142,7 +142,7 @@ const DailySummaryPage: React.FC = () => {
                 {summary.topByRevenue.map((ts, i) => (
                   <div key={ts.productName} className={style.topSeller}>
                     <Typography variant="body2">{i + 1}. {ts.productName}</Typography>
-                    <Typography variant="body2" fontWeight={600}>P{ts.totalRevenue?.toFixed(2)}</Typography>
+                    <Typography variant="body2" fontWeight={600}>₱{ts.totalRevenue?.toFixed(2)}</Typography>
                   </div>
                 ))}
               </CardContent>

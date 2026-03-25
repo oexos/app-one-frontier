@@ -310,7 +310,7 @@ const AddEditProductPage: React.FC = () => {
       </Card>
 
       <Dialog open={deleteConfirm} onClose={() => setDeleteConfirm(false)}>
-        <DialogTitle>Delete Product?</DialogTitle>
+        <DialogTitle>Delete {watch("name") ? `'${watch("name")}'` : "Product"}?</DialogTitle>
         <DialogContent>
           <Typography>This will permanently delete this product. Past sales records will be preserved.</Typography>
         </DialogContent>

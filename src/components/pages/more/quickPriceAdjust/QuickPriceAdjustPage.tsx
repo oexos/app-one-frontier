@@ -179,16 +179,16 @@ const QuickPriceAdjustPage: React.FC = () => {
                       <div className={style.previewPrices}>
                         {p.currentSellingPrice !== p.newSellingPrice && (
                           <Typography variant="caption" display="block">
-                            Sell: <span className={style.oldPrice}>P{p.currentSellingPrice.toFixed(2)}</span>
+                            Sell: <span className={style.oldPrice}>₱{p.currentSellingPrice.toFixed(2)}</span>
                             {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
-                            <span className={style.newPrice}>P{p.newSellingPrice.toFixed(2)}</span>
+                            <span className={style.newPrice}>₱{p.newSellingPrice.toFixed(2)}</span>
                           </Typography>
                         )}
                         {p.currentCostPrice !== p.newCostPrice && (
                           <Typography variant="caption" display="block">
-                            Cost: <span className={style.oldPrice}>P{p.currentCostPrice.toFixed(2)}</span>
+                            Cost: <span className={style.oldPrice}>₱{p.currentCostPrice.toFixed(2)}</span>
                             {" "}<ArrowForwardIcon sx={{ fontSize: 12, verticalAlign: "middle" }} />{" "}
-                            <span className={style.newPrice}>P{p.newCostPrice.toFixed(2)}</span>
+                            <span className={style.newPrice}>₱{p.newCostPrice.toFixed(2)}</span>
                           </Typography>
                         )}
                         {p.currentSellingPrice === p.newSellingPrice && p.currentCostPrice === p.newCostPrice && (
@@ -294,7 +294,7 @@ const QuickPriceAdjustPage: React.FC = () => {
                     <div style={{ flex: 1 }}>
                       <Typography variant="body2" fontWeight={500}>{p.name}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Sell: P{p.sellingPrice.toFixed(2)} | Cost: P{p.costPrice.toFixed(2)}
+                        Sell: ₱{p.sellingPrice.toFixed(2)} | Cost: ₱{p.costPrice.toFixed(2)}
                       </Typography>
                     </div>
                   </CardContent>

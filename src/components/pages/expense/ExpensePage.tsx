@@ -31,7 +31,7 @@ const ExpensePage: React.FC = () => {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [expenseDate, setExpenseDate] = useState(dayjs().format("YYYY-MM-DD"));
-  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<ExpenseResponse | null>(null);
 
   const loadExpenses = useCallback(async (pageNum: number, append: boolean) => {
     setIsLoading(true);
@@ -138,14 +138,14 @@ const ExpensePage: React.FC = () => {
                 {showHeader && (
                   <div className={style.dayHeader}>
                     <Typography variant="body2" fontWeight={600} color="text.secondary">{dayLabel}</Typography>
-                    <Typography variant="body2" fontWeight={600} color="error">-P{dayTotal.toFixed(2)}</Typography>
+                    <Typography variant="body2" fontWeight={600} color="error">-₱{dayTotal.toFixed(2)}</Typography>
                   </div>
                 )}
                 <Card>
                   <CardContent sx={{ p: 2, "&:last-child": { pb: 2 }, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                       <Typography variant="body1" fontWeight={500}>{expense.description}</Typography>
-                      <Typography variant="body2" color="error" fontWeight={600}>-P{expense.amount.toFixed(2)}</Typography>
+                      <Typography variant="body2" color="error" fontWeight={600}>-₱{expense.amount.toFixed(2)}</Typography>
                     </div>
                     <div>
                       <Tooltip title="Edit this expense" arrow>
@@ -154,7 +154,7 @@ const ExpensePage: React.FC = () => {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete this expense" arrow>
-                        <IconButton size="small" color="error" onClick={() => setDeleteConfirm(expense.id)}>
+                        <IconButton size="small" color="error" onClick={() => setDeleteConfirm(expense)}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -227,9 +227,12 @@ const ExpensePage: React.FC = () => {
 
       <Dialog open={deleteConfirm !== null} onClose={() => setDeleteConfirm(null)}>
         <DialogTitle>Delete Expense?</DialogTitle>
+        <DialogContent>
+          <Typography>Delete expense '{deleteConfirm?.description} ₱{deleteConfirm?.amount.toFixed(2)}'?</Typography>
+        </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteConfirm(null)}>Cancel</Button>
-          <Button color="error" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>Delete</Button>
+          <Button color="error" onClick={() => deleteConfirm && handleDelete(deleteConfirm.id)}>Delete</Button>
         </DialogActions>
       </Dialog>
     </div>

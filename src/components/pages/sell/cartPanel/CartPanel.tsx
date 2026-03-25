@@ -100,7 +100,7 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
         PaperProps={{ sx: { maxHeight: "85vh", borderTopLeftRadius: 16, borderTopRightRadius: 16, maxWidth: 480, margin: "0 auto" } }}
       >
         <div className={style.header}>
-          <Typography variant="h6" fontWeight={600}>Cart ({cartItemCount} items)</Typography>
+          <Typography variant="h6" fontWeight={600}>Cart ({cartItemCount} {cartItemCount === 1 ? "item" : "items"})</Typography>
           <IconButton onClick={onClose}><CloseIcon /></IconButton>
         </div>
         <Divider />
@@ -114,11 +114,11 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
                 <div className={style.itemInfo}>
                   <Typography variant="body1" fontWeight={500}>{item.productName}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    P{item.sellingPrice.toFixed(2)} x {item.quantity} = P{item.subtotal.toFixed(2)}
+                    ₱{item.sellingPrice.toFixed(2)} x {item.quantity} = ₱{item.subtotal.toFixed(2)}
                   </Typography>
                   <Tooltip title="Total stock in your inventory" arrow>
                     <Typography variant="caption" color="text.secondary">
-                      Available: {item.availableStock}
+                      Available: {item.availableStock - item.quantity}
                     </Typography>
                   </Tooltip>
                 </div>
@@ -189,7 +189,7 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
             <Divider />
             <div className={style.total}>
               <Typography variant="h6" fontWeight={700}>Total</Typography>
-              <Typography variant="h6" fontWeight={700} color="primary">P{cartTotal.toFixed(2)}</Typography>
+              <Typography variant="h6" fontWeight={700} color="primary">₱{cartTotal.toFixed(2)}</Typography>
             </div>
             <Tooltip title="Finalize sale and deduct inventory" arrow>
               <span>

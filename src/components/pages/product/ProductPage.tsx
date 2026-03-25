@@ -131,7 +131,7 @@ const ProductPage: React.FC = () => {
                 <div>
                   <Typography variant="body1" fontWeight={600}>{product.name}</Typography>
                   <Typography variant="body2" color="primary" fontWeight={600}>
-                    P{product.sellingPrice.toFixed(2)}
+                    ₱{product.sellingPrice.toFixed(2)}
                   </Typography>
                   <Typography variant="caption" color={product.isLowStock ? "error" : "text.secondary"}>
                     Stock: {product.quantity} {product.isLowStock && "- Low!"}

@@ -93,7 +93,7 @@ const CategoryPage: React.FC = () => {
               <div>
                 <Typography variant="body1" fontWeight={500}>{cat.name}</Typography>
                 <Tooltip title="Number of products in this category" arrow>
-                  <Typography variant="caption" color="text.secondary">{cat.productCount} products</Typography>
+                  <Typography variant="caption" color="text.secondary">{cat.productCount} {cat.productCount === 1 ? "product" : "products"}</Typography>
                 </Tooltip>
               </div>
               <div>
