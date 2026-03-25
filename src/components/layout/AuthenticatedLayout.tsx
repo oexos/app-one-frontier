@@ -73,10 +73,16 @@ const AuthenticatedLayout: React.FC = () => {
   if (storeError) {
     return (
       <div className={style.loading}>
-        <Typography variant="body1" sx={{ mb: 2 }}>Failed to load your store. Please try again.</Typography>
-        <Button variant="contained" onClick={() => loadStore()}>
-          Retry
-        </Button>
+        <div className={style.errorCard}>
+          <Typography variant="h3" sx={{ mb: 0.5 }}>:(</Typography>
+          <Typography variant="h6" fontWeight={600}>Something went wrong</Typography>
+          <Typography variant="body2" color="text.secondary">
+            We couldn't load your store. This can happen with new accounts — please try again.
+          </Typography>
+          <Button variant="contained" size="large" onClick={() => loadStore()} sx={{ mt: 1, borderRadius: 2, px: 4 }}>
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }

@@ -61,6 +61,27 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
     setEditQty(String(currentQty));
   };
 
+  const handleQtyChange = (value: string, productId: number, availableStock: number, productName: string) => {
+    if (value === "") {
+      setEditQty("");
+      return;
+    }
+    const parsed = parseInt(value);
+    if (isNaN(parsed)) return;
+    if (parsed > availableStock) {
+      showSnackbar(`Only ${availableStock} ${productName} in stock.`, "error");
+      const clamped = Math.max(1, availableStock);
+      setEditQty(String(clamped));
+      dispatch(setItemQuantity({ productId, quantity: clamped }));
+    } else if (parsed < 1) {
+      setEditQty("1");
+      dispatch(setItemQuantity({ productId, quantity: 1 }));
+    } else {
+      setEditQty(String(parsed));
+      dispatch(setItemQuantity({ productId, quantity: parsed }));
+    }
+  };
+
   const commitEdit = (productId: number, availableStock: number) => {
     const parsed = parseInt(editQty);
     if (!isNaN(parsed) && parsed >= 1) {
@@ -112,13 +133,13 @@ const CartPanel: React.FC<CartPanelProps> = ({ open, onClose, showSnackbar, onSa
                       size="small"
                       type="number"
                       value={editQty}
-                      onChange={(e) => setEditQty(e.target.value)}
+                      onChange={(e) => handleQtyChange(e.target.value, item.productId, item.availableStock, item.productName)}
                       onBlur={() => commitEdit(item.productId, item.availableStock)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") commitEdit(item.productId, item.availableStock);
                         if (["e", "E", "+", "-", "."].includes(e.key)) e.preventDefault();
                       }}
-                      inputProps={{ inputMode: "numeric", min: 1, style: { textAlign: "center", width: 40, padding: "4px 0" } }}
+                      inputProps={{ inputMode: "numeric", min: 1, max: item.availableStock, style: { textAlign: "center", width: 40, padding: "4px 0" } }}
                       autoFocus
                       sx={{ mx: 0.5, width: 56 }}
                     />
