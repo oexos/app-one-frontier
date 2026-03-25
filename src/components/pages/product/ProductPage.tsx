@@ -163,7 +163,7 @@ const ProductPage: React.FC = () => {
           onClick={() => navigate("/products/add")}
           sx={{
             "&&": {
-              position: "fixed",
+              position: "absolute",
               bottom: 72,
               right: 16,
               backgroundColor: "#1976d2",

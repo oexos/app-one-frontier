@@ -173,7 +173,7 @@ const ExpensePage: React.FC = () => {
       </InfiniteScrollList>
 
       <Tooltip title="Add a new expense" arrow>
-        <Fab onClick={openAddDialog} sx={{ "&&": { position: "fixed", bottom: 72, right: 16, backgroundColor: "#1976d2", color: "#fff" }, zIndex: 99, "&:hover": { backgroundColor: "#1565c0" } }}>
+        <Fab onClick={openAddDialog} sx={{ "&&": { position: "absolute", bottom: 72, right: 16, backgroundColor: "#1976d2", color: "#fff" }, zIndex: 99, "&:hover": { backgroundColor: "#1565c0" } }}>
           <AddIcon />
         </Fab>
       </Tooltip>
